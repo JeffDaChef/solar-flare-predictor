@@ -1,0 +1,33 @@
+name: Daily Solar Flare Forecast
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Issue forecast and update scoreboard
+        run: PYTHONPATH=src python -m daily
+      - name: Publish data to the website folder
+        run: |
+          cp results/forecast_log.jsonl docs/forecast_log.jsonl
+          cp results/scoreboard.json docs/scoreboard.json
+      - name: Commit the updated log
+        run: |
+          git config user.name "solar-flare-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add results/forecast_log.jsonl results/scoreboard.json docs/forecast_log.jsonl docs/scoreboard.json
+          git commit -m "Daily forecast $(date -u +%Y-%m-%d)" || echo "no changes to commit"
+          git push

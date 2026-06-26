@@ -1,0 +1,18 @@
+HONEST split: train on 1,2  pick threshold on 3  test on 4,5
+  train 162049  val 42510  test 126626  (test is 1.7% flares)
+
+  logistic regression    TSS 0.833  HSS 0.201  sens 0.945  spec 0.888  acc 0.889
+                         flagged 15950 as flares, of which 2155 were real (threshold 0.28)
+  random forest          TSS 0.807  HSS 0.263  sens 0.882  spec 0.925  acc 0.924
+                         flagged 11213 as flares, of which 2155 were real (threshold 0.02)
+
+LEAKY split: same data pooled, split at random (overlapping windows leak)
+
+  logistic regression    TSS 0.855  HSS 0.263  sens 0.943  spec 0.912  acc 0.912
+                         flagged 8624 as flares, of which 1543 were real (threshold 0.52)
+  random forest          TSS 0.981  HSS 0.739  sens 0.994  spec 0.987  acc 0.987
+                         flagged 2577 as flares, of which 1543 were real (threshold 0.08)
+
+Leakage inflation (leaky TSS minus honest TSS):
+  logistic regression: +0.021
+  random forest:       +0.174

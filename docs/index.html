@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solar Flare Forecast</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; max-width: 760px; margin: 2rem auto;
+         padding: 0 1rem; color: #111; background: #fff; line-height: 1.55; }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.15rem; margin-top: 2rem; }
+  .big { font-size: 2.2rem; font-weight: bold; margin: 0.3rem 0; }
+  table { border-collapse: collapse; width: 100%; margin-top: 0.5rem; }
+  th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; font-size: 0.9rem; }
+  .muted { color: #666; font-size: 0.9rem; }
+  a { color: #06c; }
+</style>
+</head>
+<body>
+<h1>Solar Flare Forecast</h1>
+<p>This page shows a live daily forecast of whether a major (M or X class) solar flare
+will happen on the Sun in the next 24 hours. It updates on its own once a day, logs
+every forecast, and grades itself against what actually happened and against NOAA's
+official forecast. I built it to learn how this works, and the whole point was to keep
+it honest. The code and the full writeup are
+<a href="https://github.com/jeffdachef/solar-flare-predictor">on GitHub</a>.</p>
+
+<h2>Today</h2>
+<p class="big" id="today">loading...</p>
+<p class="muted" id="today-detail"></p>
+
+<h2>Track record</h2>
+<p id="scoreboard">loading...</p>
+
+<h2>Recent forecasts</h2>
+<table id="recent">
+<thead><tr><th>Issued (UTC)</th><th>My forecast</th><th>NOAA</th><th>Flare?</th></tr></thead>
+<tbody></tbody>
+</table>
+
+<p class="muted">Active-region data comes from NASA and Stanford JSOC, flare outcomes
+and the NOAA baseline from the NOAA Space Weather Prediction Center, and the training
+data from the SWAN-SF benchmark. On historical data the forecast scores an AUC of 0.94.
+On the live Sun it currently runs more conservative than NOAA, which this page shows
+honestly rather than hiding.</p>
+
+<script>
+function pct(x){ return (x==null || isNaN(x)) ? "n/a" : (100*x).toFixed(1)+"%"; }
+function fmtTime(s){ return s.slice(0,16).replace("T"," "); }
+
+async function fetchMaybe(url){
+  try { const r = await fetch(url, {cache: "no-store"}); if(!r.ok) return null; return await r.text(); }
+  catch(e){ return null; }
+}
+
+async function load(){
+  const logText = await fetchMaybe("forecast_log.jsonl");
+  const forecasts = logText ? logText.trim().split("\n").filter(l => l).map(JSON.parse) : [];
+  const boardText = await fetchMaybe("scoreboard.json");
+  const board = boardText ? JSON.parse(boardText) : null;
+
+  const outcome = {};
+  if(board && board.graded){ board.graded.forEach(g => { outcome[g.issued_utc] = g.actual; }); }
+
+  const todayEl = document.getElementById("today");
+  const detailEl = document.getElementById("today-detail");
+  if(forecasts.length){
+    const last = forecasts[forecasts.length - 1];
+    todayEl.textContent = pct(last.full_disk_prob) + " chance of a major flare in 24h";
+    let d = "Issued " + fmtTime(last.issued_utc) + " UTC, from " + last.n_regions + " active regions.";
+    if(last.noaa_major_prob != null){ d += " NOAA for the same day: " + pct(last.noaa_major_prob) + "."; }
+    detailEl.textContent = d;
+  } else {
+    todayEl.textContent = "No forecast yet.";
+  }
+
+  const sEl = document.getElementById("scoreboard");
+  if(board && board.summary && board.summary.n > 0){
+    const sum = board.summary;
+    let t = "Over " + sum.n + " graded forecasts (" + sum.flares + " had a real flare): "
+          + "TSS " + sum.model.tss.toFixed(2) + ", HSS " + sum.model.hss.toFixed(2)
+          + ", Brier " + sum.model.brier.toFixed(3) + ".";
+    if(sum.noaa){
+      t += " On the " + sum.noaa.n + " days NOAA also forecast, mine scored TSS "
+        + sum.model_head_to_head.tss.toFixed(2) + " against NOAA's " + sum.noaa.tss.toFixed(2) + ".";
+    }
+    sEl.textContent = t;
+  } else {
+    sEl.textContent = "No forecast has finished its 24 hour window yet. "
+      + "The scoreboard fills in on its own as the days pass.";
+  }
+
+  const body = document.querySelector("#recent tbody");
+  forecasts.slice(-14).reverse().forEach(f => {
+    let out = "pending";
+    if(f.issued_utc in outcome){ out = outcome[f.issued_utc] ? "yes" : "no"; }
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + fmtTime(f.issued_utc) + "</td><td>" + pct(f.full_disk_prob)
+      + "</td><td>" + pct(f.noaa_major_prob) + "</td><td>" + out + "</td>";
+    body.appendChild(tr);
+  });
+}
+load();
+</script>
+</body>
+</html>

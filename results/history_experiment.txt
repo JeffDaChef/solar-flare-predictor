@@ -1,0 +1,3 @@
+Does adding recent flare history help? (logistic regression, honest split)
+  magnetic only (144 feat)   TSS 0.833  HSS 0.201  sens 0.945  spec 0.888
+  with history (148 feat)    TSS 0.826  HSS 0.245  sens 0.911  spec 0.915
