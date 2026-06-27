@@ -1,46 +1,47 @@
 # Solar Flare Predictor
 
-This is a system that forecasts major solar flares. Every day it pulls the current
-state of the Sun's active regions, estimates the chance that an M or X class flare
-happens in the next 24 hours, writes that forecast down, and later grades itself
-against what the Sun actually did and against NOAA's own forecast. Behind it are
-machine learning models trained and honestly evaluated on a public benchmark, with
-the neural networks written from scratch.
+So this is a system that tries to predict big solar flares. Every day it grabs the
+current state of the Sun's active regions, gives a probability that a major (M or X
+class) flare goes off in the next 24 hours, saves that forecast, and then a day later
+checks itself against what actually happened and against what NOAA predicted. There is
+a bunch of machine learning behind it, trained on a public dataset, and I wrote the
+neural networks from scratch instead of just importing them.
 
-I built this mostly to understand it, so the theme running through the whole thing is
-not fooling myself. Major flares are rare, which makes it easy to build a model that
-looks amazing and is useless. Most of the real work went into measuring honestly.
+I mostly built this because I wanted to actually understand how it works, so the thing
+I cared about the whole time was not fooling myself. Major flares are rare, and that
+makes it really easy to build a model that looks amazing and is secretly useless.
+Honestly most of the work was just being careful about how I measured stuff.
 
-## What it does, and how well
+## How well does it work
 
-On a full held-out year of historical data, the whole-Sun daily forecast tells flare
-days from quiet days with an AUC of 0.94 and a TSS of 0.75, and it is well-calibrated,
-predicting flares on about 10 percent of days when the real rate is 8 percent. TSS is
-the standard skill score for this problem, where 0 is no skill and 1 is perfect.
+On a full held-out year of old data, the whole-Sun forecast separates flare days from
+quiet days pretty well, AUC 0.94 and TSS 0.75. TSS is the score people use for this
+where 0 is no skill and 1 is perfect. It is also calibrated, so when it says 10 percent
+it is actually right about 10 percent of the time.
 
-I trained four different models, from a one-line logistic regression to a hand-built
-LSTM, and they all land in a narrow band around TSS 0.83. That agreement is the point.
-This problem has a low ceiling that nobody beats by much, so a fancier model does not
-win here, and a number far above the band almost always means a data leak rather than
-a breakthrough.
+I trained four models, everything from a one line logistic regression up to a hand
+built LSTM, and they all ended up around TSS 0.83. That is kind of the real result.
+This problem has a low ceiling that basically nobody beats, so a fancier model does not
+magically do better, and if you ever see a number way above that range it is almost
+always a data leak and not a breakthrough.
 
-The two neural networks (a small multilayer net and an LSTM) are written from scratch
-in numpy, backpropagation included, then checked against PyTorch. They match PyTorch's
-gradients to machine precision, about 1e-16.
+The two neural nets (a small regular one and an LSTM) are written from scratch in numpy,
+backprop math and all, and I checked them against PyTorch. The gradients match to about
+1e-16, which is around as exact as a computer can get.
 
-## The honesty parts, which are the actual hard part
+## The honest parts, which were actually the hard part
 
-- The metric. At 60 to 1 odds, an always-no-flare model scores 98 percent accuracy and
-  has zero real skill, so I use TSS and HSS instead of accuracy.
-- The leakage trap. The data has heavily overlapping time windows, so a random split
-  lets near-copies leak between training and test. I proved this in my own code. A
-  random forest jumps from a real TSS of 0.81 to a fake 0.98 on a careless random
-  split. The honest way is to split by the dataset's separate time periods, which is
-  what I do everywhere.
-- Live and graded in public. The forecast runs every day on its own and scores itself
-  against reality and against NOAA, the government forecasters. Right now my model is
-  more conservative than NOAA, because it only reads the magnetic field while they also
-  use each region's recent flare history. I show that gap honestly instead of hiding it.
+- The metric. Flares are about 60 to 1 rare, so a model that always says "no flare"
+  gets 98 percent accuracy and is completely useless. So I score with TSS and HSS
+  instead of accuracy.
+- The leakage trap. The data has windows that overlap a lot, so if you split it at
+  random you get near copies in both training and testing and the score turns into a
+  lie. I proved this on myself. A random forest jumps from a real 0.81 to a fake 0.98
+  just from a sloppy random split. So I split by time period instead, everywhere.
+- Live and graded in public. It runs every day on its own and scores itself against
+  reality and against NOAA. Right now my model is more cautious than NOAA, because it
+  only reads the magnetic field while they also know each region's recent flare
+  history. I would rather show that gap than hide it.
 
 ## Running it
 
@@ -51,27 +52,28 @@ You need Python 3. From the project folder:
     .venv/bin/python -m pip install -r requirements-dev.txt
     .venv/bin/python -m pytest
 
-To issue a live forecast (it pulls the real Sun, needs internet, no account required):
+To make a live forecast (it pulls the real Sun, needs internet, no account needed):
 
     PYTHONPATH=src .venv/bin/python -m daily
 
-The historical training data (SWAN-SF, about 6 GB) is not in the repo. The model is
-small and already trained and saved under models/, so the daily forecast runs without
-the training data.
+The training data (SWAN-SF, about 6 GB) is not in the repo because it is huge. The
+trained model is tiny and already saved in models/, so the daily forecast still works
+without it.
 
-## Layout
+## What is where
 
-- src/ loading, metrics, preprocessing, the models, and the live system.
-- src/nn/ the from-scratch neural networks and the checks that verify them.
-- src/live/ the daily forecast, the NOAA grader, and the scoreboard.
-- tests/ the unit tests.
-- results/ the forecast log, the scoreboard, and the evaluation numbers.
-- EXPLAINED.md a plain-language walkthrough of the whole thing, step by step.
-- docs/paper.md the deeper technical writeup.
+- src/ is the code, loading, metrics, cleaning, the models, and the live system.
+- src/nn/ is the from scratch neural nets and the checks that prove they work.
+- src/live/ is the daily forecast, the NOAA grader, and the scoreboard.
+- tests/ is the tests.
+- results/ has the forecast log, the scoreboard, and the evaluation numbers.
+- EXPLAINED.md walks through the whole thing in plain words, step by step.
+- docs/paper.md is the longer, more technical version.
 
 ## Where the data comes from
 
 - Historical training data, the SWAN-SF benchmark on Harvard Dataverse, DOI
   10.7910/DVN/EBCFKM.
-- Live active-region data, the NASA and Stanford JSOC archive, through the drms package.
-- Flare outcomes and the baseline forecast, the NOAA Space Weather Prediction Center.
+- Live active region data, NASA and Stanford's JSOC, through the drms package.
+- Flare outcomes and the NOAA baseline forecast, the NOAA Space Weather Prediction
+  Center.
