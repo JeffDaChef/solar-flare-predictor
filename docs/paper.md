@@ -35,7 +35,7 @@ that make this honest, so I left it alone.
 
 ## Metrics
 
-I score with the True Skill Statistic (TSS) and the Heidke Skill Score (HSS), never
+I score with the True Skill Statistic (TSS) and the Heidke Skill Score (HSS) instead of
 plain accuracy. From the confusion matrix,
 
     TSS = TP / (TP + FN) minus FP / (FP + TN)
@@ -84,7 +84,7 @@ summary numbers per parameter, the mean, the spread, the min, the max, the last 
 and the trend. That is 144 numbers per example, and the summaries just skip over missing
 values on their own. For the LSTM I keep the full sequence instead.
 
-Two careful things. Missing values get filled in, not dropped, because dropping them
+Two careful things. Missing values get filled in instead of dropped, because dropping them
 throws away usable data and biases the result. And the normalization stats are figured
 out on the training data only and then applied to the test data. Working them out across
 both sets is a sneaky little form of leakage, so I do not.
@@ -98,8 +98,8 @@ I trained four of them:
 - A regular neural net written from scratch in numpy. TSS 0.827.
 - An LSTM written from scratch in numpy. TSS 0.829.
 
-The numbers are not really the headline. The agreement is. Four pretty different kinds
-of model all land between 0.81 and 0.83 on the honest split, which tells me the signal
+Honestly the agreement is the interesting part, more than any single number. Four
+pretty different kinds of model all land between 0.81 and 0.83 on the honest split, which tells me the signal
 in these features is capped and piling on model complexity does not break through. That
 lines up with the literature, where honest reproductions sit well below the leakage
 inflated headline scores.
@@ -111,8 +111,7 @@ it two separate ways. First a numerical gradient check, comparing my analytic gr
 to finite difference estimates, which agree to about one part in a million. Second I
 rebuilt the same networks in PyTorch, fed both the same weights and inputs, and
 compared. The gradients match to roughly 1e-16, machine precision. So my from scratch
-version is not approximately right, it is identical to a trusted library down to the
-last decimal.
+version lines up with a trusted library down to the last decimal.
 
 ## Dealing with the imbalance
 
@@ -162,8 +161,8 @@ do not have enough data yet and by never publishing a literal 0 or 100 percent.
 
 ## What it does not do well
 
-On live data my forecast is currently more cautious than NOAA. It is not a bug. The
-current regions genuinely look quiet by the magnetic measurements my model reads, while
+On live data my forecast is currently more cautious than NOAA. I dug in and it is real.
+The current regions genuinely look quiet by the magnetic measurements my model reads, while
 NOAA's forecasters also use region history and complexity that a single magnetic
 snapshot just does not have. The public scoreboard is there to measure that gap over
 time instead of papering over it. The training data also stops in 2018 and uses the
