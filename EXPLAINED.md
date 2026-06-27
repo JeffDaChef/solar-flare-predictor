@@ -313,3 +313,4 @@ Honestly the part I care about most is that habit. Every time a result
 looked too good, I dug in and it turned out to be a leak or an artifact or the metric
 flattering me, and I fixed it instead of reporting it. The deeper technical version of
 all this is in docs/paper.md.
+
