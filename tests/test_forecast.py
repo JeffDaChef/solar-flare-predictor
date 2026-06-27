@@ -40,3 +40,4 @@ def test_forecast_empty():
     full_disk, rows = forecast_from_windows([], scaler, model)
     assert rows == []
     assert full_disk <= 0.01
+
