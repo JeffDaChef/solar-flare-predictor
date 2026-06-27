@@ -31,3 +31,4 @@ jobs:
           git add results/forecast_log.jsonl results/scoreboard.json docs/forecast_log.jsonl docs/scoreboard.json
           git commit -m "Daily forecast $(date -u +%Y-%m-%d)" || echo "no changes to commit"
           git push
+
