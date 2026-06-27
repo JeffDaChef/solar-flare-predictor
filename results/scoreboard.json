@@ -1,7 +1,33 @@
 {
   "summary": {
-    "n": 0,
-    "threshold": 0.5
+    "n": 1,
+    "flares": 0,
+    "threshold": 0.5,
+    "model": {
+      "n": 1,
+      "tss": 0.0,
+      "hss": 0.0,
+      "brier": 2.5e-05
+    },
+    "noaa": {
+      "n": 1,
+      "tss": 0.0,
+      "hss": 0.0,
+      "brier": 0.09
+    },
+    "model_head_to_head": {
+      "n": 1,
+      "tss": 0.0,
+      "hss": 0.0,
+      "brier": 2.5e-05
+    }
   },
-  "graded": []
+  "graded": [
+    {
+      "issued_utc": "2026-06-23T18:41:52.342256+00:00",
+      "prob": 0.005,
+      "noaa_prob": 0.3,
+      "actual": false
+    }
+  ]
 }
