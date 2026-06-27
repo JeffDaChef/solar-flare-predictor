@@ -1,3 +1,5 @@
+import time
+
 import drms
 import pandas as pd
 
@@ -5,11 +7,19 @@ from load import PARAMETERS
 
 NRT_SERIES = "hmi.sharp_cea_720s_nrt"
 KEY_LIST = "HARPNUM,T_REC,NOAA_ARS,QUALITY," + ",".join(PARAMETERS)
+RETRIES = 3
+RETRY_WAIT = 15
 
 
-def query_window(time_spec, client=None):
+def query_window(time_spec, client=None, retries=RETRIES, wait=RETRY_WAIT):
     client = client or drms.Client()
-    return client.query(NRT_SERIES + "[]" + time_spec, key=KEY_LIST)
+    for attempt in range(retries):
+        try:
+            return client.query(NRT_SERIES + "[]" + time_spec, key=KEY_LIST)
+        except Exception:
+            if attempt == retries - 1:
+                raise
+            time.sleep(wait)
 
 
 def group_windows(df):
