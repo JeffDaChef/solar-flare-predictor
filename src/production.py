@@ -46,3 +46,4 @@ def train_and_save(train_parts=(1, 2, 3, 4), calib_parts=(5,), path=MODEL_PATH):
 if __name__ == "__main__":
     path, n, flares = train_and_save()
     print("saved %s, trained on %d instances (%d flares)" % (path, n, flares))
+
