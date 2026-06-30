@@ -11,18 +11,14 @@ RETRIES = 3
 RETRY_WAIT = 15
 
 
-class DataUnavailable(Exception):
-    pass
-
-
 def query_window(time_spec, client=None, retries=RETRIES, wait=RETRY_WAIT):
     client = client or drms.Client()
     for attempt in range(retries):
         try:
             return client.query(NRT_SERIES + "[]" + time_spec, key=KEY_LIST)
-        except Exception as error:
+        except Exception:
             if attempt == retries - 1:
-                raise DataUnavailable(str(error)) from error
+                raise
             time.sleep(wait)
 
 

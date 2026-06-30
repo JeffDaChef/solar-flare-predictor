@@ -1,14 +1,9 @@
-from live.fetch import DataUnavailable
 from live.forecast import make_forecast
 from live.scoreboard import build_scoreboard
 
 
 def main():
-    try:
-        record = make_forecast()
-    except DataUnavailable as error:
-        print("Skipping today, could not reach the solar data server: %s" % error)
-        return
+    record = make_forecast()
     print("Forecast: %.1f%% chance of a major flare in 24h (%d active regions)"
           % (100 * record["full_disk_prob"], record["n_regions"]))
     if record.get("noaa_major_prob") is not None:
