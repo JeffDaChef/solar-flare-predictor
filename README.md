@@ -31,7 +31,7 @@ numpy, including the backprop math, and I checked them against PyTorch to make s
 did not mess it up. They match PyTorch's gradients to about 1e-16, which is pretty
 much as exact as a computer gets.
 
-## The honest stuff, which was actually the hard part
+## Hard part
 
 - The score. Flares are like 60 to 1 rare, so a model that just always says "no
   flare" gets 98 percent accuracy and is completely useless. So I use TSS and HSS
