@@ -44,6 +44,13 @@ def accuracy(y_true, y_pred):
     return _safe_divide(tp + tn, tp + fp + fn + tn)
 
 
+def best_threshold(y_true, proba, grid=None):
+    grid = np.linspace(0.02, 0.98, 49) if grid is None else np.asarray(grid)
+    proba = np.asarray(proba)
+    scores = [tss(y_true, (proba >= t).astype(int)) for t in grid]
+    return float(grid[int(np.argmax(scores))])
+
+
 def all_scores(y_true, y_pred):
     return {
         "tss": tss(y_true, y_pred),

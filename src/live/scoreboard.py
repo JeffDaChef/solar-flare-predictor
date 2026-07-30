@@ -2,11 +2,22 @@ import json
 import os
 from datetime import datetime, timedelta, timezone
 
+import joblib
+
 from live.score import fetch_goes_xray, major_flare_in_window
 from metrics import hss, tss
 
 LOG_PATH = "results/forecast_log.jsonl"
 BOARD_PATH = "results/scoreboard.json"
+MODEL_PATH = "models/production.joblib"
+FALLBACK_THRESHOLD = 0.5
+
+
+def model_threshold(model_path=MODEL_PATH, fallback=FALLBACK_THRESHOLD):
+    if not os.path.exists(model_path):
+        return fallback
+    value = joblib.load(model_path).get("threshold")
+    return fallback if value is None else float(value)
 
 
 def read_forecasts(log_path=LOG_PATH):
@@ -44,7 +55,7 @@ def _score(probs, actual, threshold):
     return {"n": len(probs), "tss": tss(actual, predicted), "hss": hss(actual, predicted), "brier": brier}
 
 
-def summarize(graded, threshold=0.5):
+def summarize(graded, threshold=FALLBACK_THRESHOLD):
     if not graded:
         return {"n": 0, "threshold": threshold}
     actual = [1 if g["actual"] else 0 for g in graded]
@@ -62,7 +73,8 @@ def summarize(graded, threshold=0.5):
     return summary
 
 
-def build_scoreboard(log_path=LOG_PATH, board_path=BOARD_PATH, threshold=0.5):
+def build_scoreboard(log_path=LOG_PATH, board_path=BOARD_PATH, threshold=None):
+    threshold = model_threshold() if threshold is None else threshold
     forecasts = read_forecasts(log_path)
     records = fetch_goes_xray()
     graded = grade_forecasts(forecasts, records)

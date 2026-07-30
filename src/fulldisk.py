@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 
 from load import iter_partition
-from metrics import tss
+from metrics import best_threshold, tss
 from preprocess import summarize_instance
 
 MODEL_PATH = "models/production.joblib"
@@ -39,11 +39,6 @@ def daily_scores(partition, scaler, model, data_dir="data"):
     noisy_or = np.array([1.0 - np.prod([1.0 - p for p in per_day[d].values()]) for d in order])
     y = np.array([flare_day[d] for d in order])
     return noisy_or, y
-
-
-def best_threshold(y, scores):
-    thresholds = np.linspace(0.02, 0.98, 49)
-    return float(thresholds[int(np.argmax([tss(y, (scores >= t).astype(int)) for t in thresholds]))])
 
 
 def evaluate(partition=5, model_path=MODEL_PATH, result_path=RESULT_PATH):

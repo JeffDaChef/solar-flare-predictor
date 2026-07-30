@@ -7,6 +7,8 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.frozen import FrozenEstimator
 from sklearn.linear_model import LogisticRegression
 
+from fulldisk import daily_scores
+from metrics import best_threshold
 from preprocess import Standardizer, features_for_partition
 
 MODEL_PATH = "models/production.joblib"
@@ -21,6 +23,15 @@ def _stack(parts):
     return np.vstack(xs), np.concatenate(ys)
 
 
+def _daily_full_disk(parts, scaler, model):
+    scores, labels = [], []
+    for n in parts:
+        s, y = daily_scores(n, scaler, model)
+        scores.append(s)
+        labels.append(y)
+    return np.concatenate(scores), np.concatenate(labels)
+
+
 def train_and_save(train_parts=(1, 2, 3, 4), calib_parts=(5,), path=MODEL_PATH):
     x_train, y_train = _stack(train_parts)
     x_calib, y_calib = _stack(calib_parts)
@@ -29,11 +40,15 @@ def train_and_save(train_parts=(1, 2, 3, 4), calib_parts=(5,), path=MODEL_PATH):
     base.fit(scaler.transform(x_train), y_train)
     model = CalibratedClassifierCV(FrozenEstimator(base), method="isotonic")
     model.fit(scaler.transform(x_calib), y_calib)
+    scores, y_days = _daily_full_disk(calib_parts, scaler, model)
+    threshold = best_threshold(y_days, scores)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     joblib.dump(
         {
             "scaler": scaler,
             "model": model,
+            "threshold": threshold,
+            "threshold_parts": list(calib_parts),
             "trained_utc": datetime.now(timezone.utc).isoformat(),
             "n_train": int(len(y_train) + len(y_calib)),
             "n_flares": int(y_train.sum() + y_calib.sum()),
