@@ -32,7 +32,7 @@ def _daily_full_disk(parts, scaler, model):
     return np.concatenate(scores), np.concatenate(labels)
 
 
-def train_and_save(train_parts=(1, 2, 3, 4), calib_parts=(5,), path=MODEL_PATH):
+def train_and_save(train_parts=(1, 2, 3), calib_parts=(4,), path=MODEL_PATH):
     x_train, y_train = _stack(train_parts)
     x_calib, y_calib = _stack(calib_parts)
     scaler = Standardizer().fit(x_train)

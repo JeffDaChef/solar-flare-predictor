@@ -44,8 +44,10 @@ def daily_scores(partition, scaler, model, data_dir="data"):
 def evaluate(partition=5, model_path=MODEL_PATH, result_path=RESULT_PATH):
     bundle = joblib.load(model_path)
     scores, y = daily_scores(partition, bundle["scaler"], bundle["model"])
-    threshold = best_threshold(y, scores)
-    pred = (scores >= threshold).astype(int)
+    deployed = bundle.get("threshold")
+    hindsight = best_threshold(y, scores)
+    if deployed is None:
+        deployed = hindsight
     result = {
         "partition": partition,
         "days": int(len(y)),
@@ -53,8 +55,11 @@ def evaluate(partition=5, model_path=MODEL_PATH, result_path=RESULT_PATH):
         "flare_rate": float(y.mean()),
         "mean_forecast": float(scores.mean()),
         "auc": float(roc_auc_score(y, scores)),
-        "tss": tss(y, pred),
-        "threshold": threshold,
+        "tss": tss(y, (scores >= deployed).astype(int)),
+        "threshold": float(deployed),
+        "threshold_source": bundle.get("threshold_parts"),
+        "tss_in_hindsight": tss(y, (scores >= hindsight).astype(int)),
+        "best_threshold_in_hindsight": hindsight,
     }
     os.makedirs(os.path.dirname(result_path), exist_ok=True)
     with open(result_path, "w") as handle:
@@ -66,6 +71,9 @@ if __name__ == "__main__":
     r = evaluate()
     print("Full-disk daily flare forecast, held-out partition %d:" % r["partition"])
     print("  %d days, %d flare days (%.1f%%)" % (r["days"], r["flare_days"], 100 * r["flare_rate"]))
-    print("  AUC %.3f   TSS %.3f" % (r["auc"], r["tss"]))
+    print("  AUC %.3f   TSS %.3f at the deployed threshold %.2f (picked on partition %s)"
+          % (r["auc"], r["tss"], r["threshold"], r["threshold_source"]))
+    print("  TSS %.3f if the threshold were refit on this partition (%.2f), which would be cheating"
+          % (r["tss_in_hindsight"], r["best_threshold_in_hindsight"]))
     print("  mean forecast %.1f%% vs actual rate %.1f%% (full-disk calibration)"
           % (100 * r["mean_forecast"], 100 * r["flare_rate"]))

@@ -55,6 +55,7 @@ def make_forecast(start_tai=None, hours=12, model_path=MODEL_PATH, log_path=LOG_
         "n_regions": len(windows),
         "full_disk_prob": full_disk,
         "noaa_major_prob": noaa,
+        "model_trained_utc": bundle.get("trained_utc"),
         "top_regions": rows[:3],
     }
     os.makedirs(os.path.dirname(log_path), exist_ok=True)

@@ -3,8 +3,13 @@
   "days": 823,
   "flare_days": 66,
   "flare_rate": 0.08019441069258809,
-  "mean_forecast": 0.1019448810545367,
-  "auc": 0.9396741523557904,
-  "tss": 0.7511108442416237,
-  "threshold": 0.1
+  "mean_forecast": 0.09436489533751129,
+  "auc": 0.9399043272887394,
+  "tss": 0.7099395540610864,
+  "threshold": 0.24,
+  "threshold_source": [
+    4
+  ],
+  "tss_in_hindsight": 0.754453384572275,
+  "best_threshold_in_hindsight": 0.12000000000000001
 }

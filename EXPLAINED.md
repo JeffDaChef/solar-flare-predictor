@@ -192,6 +192,22 @@ cutoff src/fulldisk.py learned on held out days. NOAA issue human percentages on
 totally different scale. Scoring both at one cutoff makes whichever one is on the wrong
 scale look broken, which is exactly the bug I had in both directions.
 
+Fair warning about one seam in the record. I retrained the production model on
+2026-07-31 to fix the held out data problem further down, which moved the deployed
+threshold from 0.10 to 0.24. The forecasts logged before that date came from the old
+model, so the running scoreboard is scoring them at a cutoff that was derived for the
+new one. I cannot go back and recompute them because I only ever logged the resulting
+probability, not the magnetic inputs. Every forecast from now on records which model
+made it. The live TSS dropped from 0.15 to 0.08 when the threshold changed, and I would
+rather show that than keep the friendlier cutoff I got from the leaky setup.
+
+The deeper reason the live numbers are weak is not the threshold anyway. My model's
+live forecasts average about 2 percent while its historical forecasts average 9 percent,
+and the real flare rate in this live stretch has been around 39 percent against 8
+percent in training. The Sun is a lot busier now than in the data I trained on, which
+ends in 2018, so the model is under-forecasting by roughly four times. No cutoff fixes
+that. It needs newer training data.
+
 ## Where this part lives (the scoreboard)
 
 - src/live/scoreboard.py grades past forecasts and tracks the running scores.
@@ -246,8 +262,25 @@ My model rates one region at a time, but the real daily question is whether any 
 on the Sun will flare in the next 24 hours, so I combine the regions into one full disk
 number. I tested that combined forecast on a full held out year, and it is genuinely
 good. It separates flare days from quiet days with an AUC of 0.94 (1.0 is perfect, 0.5
-is a coin flip) and a TSS of 0.75, and it is well calibrated, predicting flares on
-about 10 percent of days when the real rate is 8 percent.
+is a coin flip) and a TSS of 0.71, and it is well calibrated, predicting flares on
+about 9 percent of days when the real rate is 8 percent.
+
+Getting that number honest took two fixes and I want to be clear about both, because I
+had it wrong for a while. The first is which data the model is allowed to see. The
+production model used to calibrate on partition 5 and then get tested on partition 5,
+so the "held out year" was not actually held out. It now trains on partitions 1 to 3,
+calibrates on 4, and partition 5 is never touched until the final test. Honestly the
+number barely moved, AUC went 0.940 to 0.940, so the leak was not doing much, but I
+would rather it be true than lucky.
+
+The second one mattered more. src/fulldisk.py used to pick the best decision threshold
+on the same partition it was scoring, which is just grading your own homework. Picking
+the threshold on partition 4 and applying it to partition 5 gives TSS 0.71 instead of
+0.75. That 0.04 was me marking my own exam.
+
+One thing that bugs me: the threshold comes out at 0.24 on partition 4 but 0.12 on
+partition 5. That is a big spread for one number, so I do not think the threshold is
+very well pinned down, and I would not read too much into small TSS differences.
 
 Then I lined it up against NOAA on live data, and it told me something humbling. On the
 first graded day my forecast was way too low and a flare happened, and my live numbers
@@ -318,8 +351,8 @@ That is the whole build. The short version of where it landed:
 - Four models, from a one line logistic regression to a hand built LSTM, all around
   TSS 0.83 on an honest time based split. The from scratch nets match PyTorch to
   machine precision.
-- The whole-Sun daily forecast scores AUC 0.94 and TSS 0.75 on a held out year, and it
-  is calibrated.
+- The whole-Sun daily forecast scores AUC 0.94 and TSS 0.71 on a genuinely held out
+  year, with the threshold picked before ever looking at that year, and it is calibrated.
 - A live system pulls the real Sun every day, forecasts, and grades itself against both
   reality and NOAA. Right now it runs more cautious than NOAA, and the public scoreboard
   tracks that honestly over time.

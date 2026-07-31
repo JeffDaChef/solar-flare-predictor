@@ -16,7 +16,7 @@ how I measured stuff so I would not end up fooling myself.
 ## How good is it
 
 On a full year of old data the model never saw, the whole-Sun forecast tells flare
-days apart from quiet days pretty well, an AUC of 0.94 and a TSS of 0.75. TSS is the
+days apart from quiet days pretty well, an AUC of 0.94 and a TSS of 0.71. TSS is the
 score people use for this where 0 is useless and 1 is perfect. It is also calibrated,
 so when it says like 10 percent it actually happens about 10 percent of the time.
 
