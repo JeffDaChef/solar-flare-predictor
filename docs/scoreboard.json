@@ -1,25 +1,26 @@
 {
   "summary": {
-    "n": 32,
-    "flares": 1,
-    "threshold": 0.5,
+    "n": 33,
+    "flares": 13,
+    "threshold": 0.1,
+    "noaa_threshold": 0.5,
     "model": {
-      "n": 32,
-      "tss": 0.0,
-      "hss": 0.0,
-      "brier": 0.034008143841215976
+      "n": 33,
+      "tss": 0.15384615384615385,
+      "hss": 0.18058690744920994,
+      "brier": 0.3647500002647734
     },
     "noaa": {
-      "n": 32,
-      "tss": -0.41935483870967744,
-      "hss": -0.061611374407582936,
-      "brier": 0.22218749999999998
+      "n": 33,
+      "tss": 0.3653846153846154,
+      "hss": 0.36538461538461536,
+      "brier": 0.19696969696969696
     },
     "model_head_to_head": {
-      "n": 32,
-      "tss": 0.0,
-      "hss": 0.0,
-      "brier": 0.034008143841215976
+      "n": 33,
+      "tss": 0.15384615384615385,
+      "hss": 0.18058690744920994,
+      "brier": 0.3647500002647734
     }
   },
   "graded": [
@@ -45,37 +46,37 @@
       "issued_utc": "2026-06-29T05:21:41.733860+00:00",
       "prob": 0.008750806231369812,
       "noaa_prob": 0.5,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-01T05:14:20.777789+00:00",
       "prob": 0.032452220029972834,
       "noaa_prob": 0.7,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-02T04:51:46.436415+00:00",
       "prob": 0.2885047963739936,
       "noaa_prob": 0.7,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-03T04:33:55.324195+00:00",
       "prob": 0.028502094732263394,
       "noaa_prob": 0.7,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-04T04:26:46.752018+00:00",
       "prob": 0.012792152103412557,
       "noaa_prob": 0.7,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-05T04:48:03.632961+00:00",
       "prob": 0.006788861136473923,
       "noaa_prob": 0.75,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-06T05:02:03.141111+00:00",
@@ -87,13 +88,13 @@
       "issued_utc": "2026-07-07T04:41:11.752512+00:00",
       "prob": 0.005,
       "noaa_prob": 0.55,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-08T04:00:31.234146+00:00",
       "prob": 0.005,
       "noaa_prob": 0.4,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-09T04:40:36.662854+00:00",
@@ -117,7 +118,7 @@
       "issued_utc": "2026-07-12T04:19:52.934260+00:00",
       "prob": 0.005,
       "noaa_prob": 0.25,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-13T04:23:34.199280+00:00",
@@ -165,19 +166,19 @@
       "issued_utc": "2026-07-20T04:32:26.686282+00:00",
       "prob": 0.005,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-21T04:09:03.390486+00:00",
       "prob": 0.11834319526627213,
       "noaa_prob": 0.4,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-22T04:10:51.616560+00:00",
       "prob": 0.009715809482830018,
       "noaa_prob": 0.55,
-      "actual": false
+      "actual": true
     },
     {
       "issued_utc": "2026-07-23T04:01:17.485470+00:00",
@@ -213,6 +214,12 @@
       "issued_utc": "2026-07-28T03:53:55.832166+00:00",
       "prob": 0.008076908399206384,
       "noaa_prob": 0.4,
+      "actual": false
+    },
+    {
+      "issued_utc": "2026-07-29T03:57:18.349462+00:00",
+      "prob": 0.013757780772445716,
+      "noaa_prob": 0.3,
       "actual": false
     }
   ]

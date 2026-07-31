@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from live.scoreboard import grade_forecasts, summarize
+from live.scoreboard import grade_forecasts, summarize, window_covered
 
 
 def dt(text):
@@ -25,6 +25,33 @@ def test_no_flare_in_window():
     now = dt("2026-06-03T00:00:00+00:00")
     graded = grade_forecasts(forecasts, records, now=now)
     assert graded[0]["actual"] is False
+
+
+def test_settled_verdict_survives_expired_records():
+    forecasts = [{"issued_utc": "2026-06-01T00:00:00+00:00", "full_disk_prob": 0.4}]
+    known = {"2026-06-01T00:00:00+00:00": {
+        "issued_utc": "2026-06-01T00:00:00+00:00",
+        "prob": 0.4,
+        "noaa_prob": None,
+        "actual": True,
+    }}
+    now = dt("2026-07-01T00:00:00+00:00")
+    graded = grade_forecasts(forecasts, [], now=now, known=known)
+    assert len(graded) == 1
+    assert graded[0]["actual"] is True
+
+
+def test_uncovered_window_is_left_ungraded():
+    forecasts = [{"issued_utc": "2026-06-01T00:00:00+00:00", "full_disk_prob": 0.4}]
+    records = [(dt("2026-06-25T05:00:00+00:00"), 3e-6)]
+    now = dt("2026-07-01T00:00:00+00:00")
+    assert grade_forecasts(forecasts, records, now=now) == []
+
+
+def test_window_covered():
+    records = [(dt("2026-06-01T05:00:00+00:00"), 3e-6)]
+    assert window_covered(records, dt("2026-06-01T00:00:00+00:00"), dt("2026-06-02T00:00:00+00:00"))
+    assert not window_covered(records, dt("2026-06-10T00:00:00+00:00"), dt("2026-06-11T00:00:00+00:00"))
 
 
 def test_summarize_metrics():

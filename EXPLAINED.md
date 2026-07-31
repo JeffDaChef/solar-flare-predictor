@@ -177,6 +177,21 @@ it works out my running skill (TSS and HSS) plus a Brier score, which measures h
 honest my probabilities were and not just the yes or no. It fills in on its own as days
 pass, and that growing record is the whole public point of the project.
 
+Two things about it took me a while to get right. NOAA's X-ray feed only goes back 7
+days, and the scoreboard used to regrade every forecast from scratch on every run. So
+once a day fell out of that 7 day window there was no flare data for it anymore and it
+quietly got marked as no flare. It was erasing its own history, and it had wiped 12 real
+flare days before I caught it. Now a day gets graded once, when its window closes and
+the data is actually there, and that verdict is saved and never recomputed. If the data
+does not cover the window the day just stays ungraded instead of being scored as a no.
+
+The other thing is that my model and NOAA get called at different thresholds, mine at
+10 percent and NOAA at 50 percent. That is not me picking a friendly number. My model is
+calibrated so its full disk probability is an honest small number, and 10 percent is the
+cutoff src/fulldisk.py learned on held out days. NOAA issue human percentages on a
+totally different scale. Scoring both at one cutoff makes whichever one is on the wrong
+scale look broken, which is exactly the bug I had in both directions.
+
 ## Where this part lives (the scoreboard)
 
 - src/live/scoreboard.py grades past forecasts and tracks the running scores.

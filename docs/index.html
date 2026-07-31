@@ -82,7 +82,8 @@ async function load(){
           + ", Brier " + sum.model.brier.toFixed(3) + ".";
     if(sum.noaa){
       t += " On the " + sum.noaa.n + " days NOAA also forecast, mine scored TSS "
-        + sum.model_head_to_head.tss.toFixed(2) + " against NOAA's " + sum.noaa.tss.toFixed(2) + ".";
+        + sum.model_head_to_head.tss.toFixed(2) + " against NOAA's " + sum.noaa.tss.toFixed(2)
+        + " (mine called at " + pct(sum.threshold) + ", NOAA at " + pct(sum.noaa_threshold) + ").";
     }
     sEl.textContent = t;
   } else {
