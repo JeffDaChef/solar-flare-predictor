@@ -201,12 +201,31 @@ probability, not the magnetic inputs. Every forecast from now on records which m
 made it. The live TSS dropped from 0.15 to 0.08 when the threshold changed, and I would
 rather show that than keep the friendlier cutoff I got from the leaky setup.
 
-The deeper reason the live numbers are weak is not the threshold anyway. My model's
-live forecasts average about 2 percent while its historical forecasts average 9 percent,
-and the real flare rate in this live stretch has been around 39 percent against 8
-percent in training. The Sun is a lot busier now than in the data I trained on, which
-ends in 2018, so the model is under-forecasting by roughly four times. No cutoff fixes
-that. It needs newer training data.
+The deeper reason the live numbers are weak is not the threshold anyway. The forecasts
+in the log average about 2 percent, and the real flare rate in this live stretch has been
+around 39 percent, so they under-forecast by roughly 17 times against what actually
+happened. The Sun is a lot busier now than in the data I trained on, which ends in 2018.
+
+Important caveat on that number. Every forecast in the log was made by the old model.
+I checked the retrained one against the old one on six recent days using the exact same
+magnetic inputs, and it forecasts about 3 times higher (0.21 average against 0.07). So
+the 17 times gap describes the model I was running, not the one running now, and the new
+one looks a good deal closer to reality. Six days is not enough to put a number on it.
+The scoreboard has to earn that the slow way.
+
+It is worth splitting that into two separate problems, because they have different
+fixes. One is that the numbers come out too small, and that one is fixable by rescaling.
+The other is that the model has gotten worse at ranking which days are risky, and that
+one is not. The old model's AUC on live data is 0.66, against 0.94 on held out history.
+Any rescaling
+you can name, prior correction, refitting the calibration, moving the threshold, is a
+monotone transform, so it leaves AUC exactly where it was. It makes the numbers honest
+without making the model smarter.
+
+I should be careful here though. 33 graded days is not much, and the 95 percent interval
+on that 0.66 runs from 0.46 to 0.85, which includes coin flipping. So I can say the live
+skill looks a lot worse than the historical skill, but I cannot say much more than that
+yet. The scoreboard needs to keep running.
 
 ## Where this part lives (the scoreboard)
 
