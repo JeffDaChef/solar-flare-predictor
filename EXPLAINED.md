@@ -128,6 +128,16 @@ negative brightness for bad readings (which is impossible, so I drop those), and
 solar data server sometimes hands back the text "Invalid KeyLink" instead of a number
 (I treat that as blank, which the cleaning step already fills in).
 
+A third mess showed up later, on August 16, when the solar data server just stopped
+answering. Not an error, it simply never replied. My code already retried three times,
+but the tries were only 15 seconds apart and each one sat there waiting on the network
+for over two minutes before giving up, so the whole thing burned almost eight minutes
+and still missed the day. Now each try gives up after 45 seconds, and the waits between
+tries stretch out (30 seconds, then 2 minutes, then 5) so the retries cover a longer
+outage instead of all landing in the same bad minute. The August 16 forecast is still
+missing from the log and I left it that way on purpose. Filling it in now, when I
+already know what the Sun did that day, would not be a real forecast.
+
 ## Where this part lives (live)
 
 - src/live/score.py grades a day using NOAA's real flare record.
