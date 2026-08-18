@@ -1,3 +1,4 @@
+import socket
 import time
 
 import drms
@@ -7,19 +8,26 @@ from load import PARAMETERS
 
 NRT_SERIES = "hmi.sharp_cea_720s_nrt"
 KEY_LIST = "HARPNUM,T_REC,NOAA_ARS,QUALITY," + ",".join(PARAMETERS)
-RETRIES = 3
-RETRY_WAIT = 15
+RETRIES = 4
+RETRY_WAITS = (30, 120, 300)
+TIMEOUT = 45
 
 
-def query_window(time_spec, client=None, retries=RETRIES, wait=RETRY_WAIT):
+def query_window(time_spec, client=None, retries=RETRIES, waits=RETRY_WAITS,
+                 timeout=TIMEOUT):
     client = client or drms.Client()
-    for attempt in range(retries):
-        try:
-            return client.query(NRT_SERIES + "[]" + time_spec, key=KEY_LIST)
-        except Exception:
-            if attempt == retries - 1:
-                raise
-            time.sleep(wait)
+    previous = socket.getdefaulttimeout()
+    socket.setdefaulttimeout(timeout)
+    try:
+        for attempt in range(retries):
+            try:
+                return client.query(NRT_SERIES + "[]" + time_spec, key=KEY_LIST)
+            except Exception:
+                if attempt == retries - 1:
+                    raise
+                time.sleep(waits[min(attempt, len(waits) - 1)])
+    finally:
+        socket.setdefaulttimeout(previous)
 
 
 def group_windows(df):
