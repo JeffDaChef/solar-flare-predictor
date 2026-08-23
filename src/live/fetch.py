@@ -32,6 +32,8 @@ def query_window(time_spec, client=None, retries=RETRIES, waits=RETRY_WAITS,
 
 def group_windows(df):
     windows = []
+    if df is None or df.empty:
+        return windows
     for harpnum, group in df.groupby("HARPNUM"):
         group = group.sort_values("T_REC")
         numeric = group[PARAMETERS].apply(pd.to_numeric, errors="coerce")
