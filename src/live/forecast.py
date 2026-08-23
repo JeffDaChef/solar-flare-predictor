@@ -12,6 +12,8 @@ from preprocess import summarize_instance
 MODEL_PATH = "models/production.joblib"
 LOG_PATH = "results/forecast_log.jsonl"
 MIN_STEPS = 20
+NO_DATA_MESSAGE = ("No usable SHARP data in this window, so no forecast was issued. "
+                   "This usually means JSOC has a gap in the near real time series.")
 
 
 def recent_window_start(hours=12):
@@ -44,6 +46,8 @@ def make_forecast(start_tai=None, hours=12, model_path=MODEL_PATH, log_path=LOG_
     bundle = joblib.load(model_path)
     windows = fetch_current_windows(start_tai, hours=hours)
     full_disk, rows = forecast_from_windows(windows, bundle["scaler"], bundle["model"])
+    if not rows:
+        return None
     issued = datetime.now(timezone.utc)
     try:
         noaa = major_probability(parse_forecast(fetch_forecast()), issued.date().isoformat())
@@ -66,13 +70,16 @@ def make_forecast(start_tai=None, hours=12, model_path=MODEL_PATH, log_path=LOG_
 
 if __name__ == "__main__":
     result = make_forecast()
-    print("Forecast issued %s" % result["issued_utc"])
-    print("Chance of an M or X flare in the next 24h: %.1f%%"
-          % (100 * result["full_disk_prob"]))
-    if result["noaa_major_prob"] is not None:
-        print("NOAA's forecast for the same day:          %.1f%%"
-              % (100 * result["noaa_major_prob"]))
-    print("Based on %d active regions. Most active:" % result["n_regions"])
-    for row in result["top_regions"]:
-        print("  HARP %d (NOAA %s): %.1f%%"
-              % (row["harpnum"], row["noaa_ars"], 100 * row["prob"]))
+    if result is None:
+        print(NO_DATA_MESSAGE)
+    else:
+        print("Forecast issued %s" % result["issued_utc"])
+        print("Chance of an M or X flare in the next 24h: %.1f%%"
+              % (100 * result["full_disk_prob"]))
+        if result["noaa_major_prob"] is not None:
+            print("NOAA's forecast for the same day:          %.1f%%"
+                  % (100 * result["noaa_major_prob"]))
+        print("Based on %d active regions. Most active:" % result["n_regions"])
+        for row in result["top_regions"]:
+            print("  HARP %d (NOAA %s): %.1f%%"
+                  % (row["harpnum"], row["noaa_ars"], 100 * row["prob"]))

@@ -33,6 +33,14 @@ def test_group_windows_shapes():
         assert "noaa_ars" in window
 
 
+def test_group_windows_empty_frame():
+    assert group_windows(pd.DataFrame()) == []
+
+
+def test_group_windows_frame_with_no_rows():
+    assert group_windows(make_df().iloc[0:0]) == []
+
+
 class FlakyClient:
     def __init__(self, failures):
         self.failures = failures

@@ -368,6 +368,19 @@ a literal 0 or 100 percent. After the fix the same day read 0.5 percent, which i
 honest. The established regions really do look quiet to the magnetic measurements, even
 though NOAA forecasts higher using region history my model ignores.
 
+Later on the daily job died with a KeyError on HARPNUM, which looked scary but was not
+my code's fault. JSOC had a 13 hour hole in the near real time SHARP series, so my query
+came back with nothing. When that happens the drms library hands you an empty table with
+no columns at all, and asking it to group by HARPNUM finds no such column. Retrying does
+not help here, the server answers instantly and correctly with "I have nothing".
+
+So now an empty result just returns no windows instead of blowing up. I also made it
+refuse to log a forecast when zero regions actually got scored, because the full disk
+math on an empty list gives 0.5 percent, and writing that to the log would look like a
+real quiet day forecast when really I just had no data. A missing day in the log is more
+honest than a made up one. The run prints a line saying the data was missing and finishes
+normally, so a satellite outage does not turn the whole thing red.
+
 ## Where this part lives (automation)
 
 - src/daily.py is the once a day job, forecast plus scoreboard.
