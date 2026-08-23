@@ -390,6 +390,7 @@ forecast log stopped growing, which is worse. So it fails loudly and I get the e
 
 - src/daily.py is the once a day job, forecast plus scoreboard.
 - .github/workflows/daily.yml is the cloud scheduler.
+- .github/workflows/tests.yml runs the test suite on every push and pull request.
 
 ## Where it stands now
 
