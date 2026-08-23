@@ -378,8 +378,13 @@ So now an empty result just returns no windows instead of blowing up. I also mad
 refuse to log a forecast when zero regions actually got scored, because the full disk
 math on an empty list gives 0.5 percent, and writing that to the log would look like a
 real quiet day forecast when really I just had no data. A missing day in the log is more
-honest than a made up one. The run prints a line saying the data was missing and finishes
-normally, so a satellite outage does not turn the whole thing red.
+honest than a made up one.
+
+The job still grades the scoreboard on those days, since that part only reads the log and
+does not need new Sun data. Then it exits with an error on purpose. I went back and forth
+on that. A red X for a Stanford outage is not something I can fix, so it is sort of noise.
+But the alternative is the job quietly doing nothing for a week and me never noticing my
+forecast log stopped growing, which is worse. So it fails loudly and I get the email.
 
 ## Where this part lives (automation)
 

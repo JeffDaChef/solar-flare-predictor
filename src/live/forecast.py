@@ -71,15 +71,14 @@ def make_forecast(start_tai=None, hours=12, model_path=MODEL_PATH, log_path=LOG_
 if __name__ == "__main__":
     result = make_forecast()
     if result is None:
-        print(NO_DATA_MESSAGE)
-    else:
-        print("Forecast issued %s" % result["issued_utc"])
-        print("Chance of an M or X flare in the next 24h: %.1f%%"
-              % (100 * result["full_disk_prob"]))
-        if result["noaa_major_prob"] is not None:
-            print("NOAA's forecast for the same day:          %.1f%%"
-                  % (100 * result["noaa_major_prob"]))
-        print("Based on %d active regions. Most active:" % result["n_regions"])
-        for row in result["top_regions"]:
-            print("  HARP %d (NOAA %s): %.1f%%"
-                  % (row["harpnum"], row["noaa_ars"], 100 * row["prob"]))
+        raise SystemExit(NO_DATA_MESSAGE)
+    print("Forecast issued %s" % result["issued_utc"])
+    print("Chance of an M or X flare in the next 24h: %.1f%%"
+          % (100 * result["full_disk_prob"]))
+    if result["noaa_major_prob"] is not None:
+        print("NOAA's forecast for the same day:          %.1f%%"
+              % (100 * result["noaa_major_prob"]))
+    print("Based on %d active regions. Most active:" % result["n_regions"])
+    for row in result["top_regions"]:
+        print("  HARP %d (NOAA %s): %.1f%%"
+              % (row["harpnum"], row["noaa_ars"], 100 * row["prob"]))
