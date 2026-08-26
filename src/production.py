@@ -38,7 +38,7 @@ def train_and_save(train_parts=(1, 2, 3), calib_parts=(4,), path=MODEL_PATH):
     scaler = Standardizer().fit(x_train)
     base = LogisticRegression(class_weight="balanced", max_iter=2000)
     base.fit(scaler.transform(x_train), y_train)
-    model = CalibratedClassifierCV(FrozenEstimator(base), method="isotonic")
+    model = CalibratedClassifierCV(FrozenEstimator(base), method="sigmoid")
     model.fit(scaler.transform(x_calib), y_calib)
     scores, y_days = _daily_full_disk(calib_parts, scaler, model)
     threshold = best_threshold(y_days, scores)

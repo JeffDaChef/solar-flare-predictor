@@ -23,7 +23,7 @@ def test_forecast_from_windows_basic():
         {"harpnum": 2, "noaa_ars": "200", "features": np.full((30, len(PARAMETERS)), 2.0)},
     ]
     full_disk, rows = forecast_from_windows(windows, scaler, model)
-    assert 0.005 <= full_disk <= 0.995
+    assert 0.001 <= full_disk <= 0.995
     assert len(rows) == 2
     assert rows[0]["prob"] >= rows[1]["prob"]
 

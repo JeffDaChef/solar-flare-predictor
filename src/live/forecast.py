@@ -35,7 +35,7 @@ def forecast_from_windows(windows, scaler, model, min_steps=MIN_STEPS):
         })
     probs = np.array([r["prob"] for r in rows])
     full_disk = float(1.0 - np.prod(1.0 - probs)) if probs.size else 0.0
-    full_disk = min(max(full_disk, 0.005), 0.995)
+    full_disk = min(max(full_disk, 0.001), 0.995)
     rows.sort(key=lambda r: r["prob"], reverse=True)
     return full_disk, rows
 

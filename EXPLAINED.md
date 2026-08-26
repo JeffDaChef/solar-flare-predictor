@@ -392,6 +392,53 @@ forecast log stopped growing, which is worse. So it fails loudly and I get the e
 - .github/workflows/daily.yml is the cloud scheduler.
 - .github/workflows/tests.yml runs the test suite on every push and pull request.
 
+## Step 11, the model that was only allowed to say zero
+
+The live forecast sat at exactly 0.5 percent for three straight weeks in August while
+the Sun threw off M flares almost every other day and NOAA climbed from 10 percent to
+55. Mine never moved. When I traced where the number actually came from, it turned out
+the model was not being cautious about the live Sun. It could not say anything except
+zero for the data it was seeing.
+
+The calibration method I picked at the last retrain, isotonic regression, learns a
+lookup table from raw model scores to probabilities, and the table it learned maps
+every score below a certain cutoff to exactly 0. Every live region was scoring below
+that cutoff. Part of the reason is that the near real time feed is missing some of the
+measurements the model leans on. R_VALUE, one of the strongest known flare predictors,
+comes back empty in the live series, and about 29 percent of the summary numbers going
+in are blanks that get silently filled with the training average. So sixteen regions
+went in, sixteen exact zeros came out, and combining sixteen zeros gives zero. The 0.5
+percent in the log was never the model talking, it was just the floor I clamp to so
+the log never shows a literal 0.
+
+The fix was switching the calibration to Platt scaling, which squashes scores through
+a smooth curve that can get very small but never reaches zero. I retrained, and the
+honest cost showed up immediately. On the held out year the numbers dipped, AUC 0.94
+to 0.92 and TSS 0.71 to 0.54 at the deployed threshold. So on paper the old model was
+better. But the old model was also incapable of producing a nonzero forecast from the
+data it actually gets every day, which makes its nicer paper numbers kind of
+meaningless. I will take the slightly worse one that works. Its first live forecast
+said 6 percent on a day NOAA said 55, so it is still the cautious one in the room, but
+the number is finally real and it moves.
+
+While I was in there I fixed a second thing I had been ignoring. Every measurement
+JSOC sends comes with a QUALITY flag, and I had been downloading it daily and never
+reading it, so about one row in six going into the model was one the instrument itself
+had marked as bad. My first idea for the fix would have been a disaster, and I am glad
+I measured before writing it. I was going to keep only rows whose flag is a clean
+zero, and it turns out one hundred percent of live rows carry some routine
+housekeeping flag, so that filter would have deleted every row of every day and the
+forecast would have gone silent forever. The actual bad data marker is one specific
+bit, so the filter checks that bit and nothing else. Same seam in the log as the last
+retrain, forecasts before 2026-08-26 came from the old model, and every record says
+which model made it.
+
+## Where this part lives (the zero bug)
+
+- src/production.py now calibrates with Platt scaling instead of isotonic.
+- src/live/fetch.py drops rows whose QUALITY flag has the bad data bit set.
+- results/fulldisk.json has the held out numbers for the current model.
+
 ## Where it stands now
 
 That is the whole build. The short version of where it landed:
@@ -399,8 +446,10 @@ That is the whole build. The short version of where it landed:
 - Four models, from a one line logistic regression to a hand built LSTM, all around
   TSS 0.83 on an honest time based split. The from scratch nets match PyTorch to
   machine precision.
-- The whole-Sun daily forecast scores AUC 0.94 and TSS 0.71 on a genuinely held out
-  year, with the threshold picked before ever looking at that year, and it is calibrated.
+- The whole-Sun daily forecast scores AUC 0.92 and TSS 0.54 on a genuinely held out
+  year, with the threshold picked before ever looking at that year, and it is
+  calibrated. It used to read better than that, and the version that read better could
+  not function on live data, which is the story in Step 11.
 - A live system pulls the real Sun every day, forecasts, and grades itself against both
   reality and NOAA. Right now it runs more cautious than NOAA, and the public scoreboard
   tracks that honestly over time.
