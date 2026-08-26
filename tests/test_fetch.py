@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 from load import PARAMETERS
-from live.fetch import TIMEOUT, fetch_current_windows, group_windows, query_window
+from live.fetch import TIMEOUT, drop_flagged, fetch_current_windows, group_windows, query_window
 
 
 def make_df():
@@ -39,6 +39,47 @@ def test_group_windows_empty_frame():
 
 def test_group_windows_frame_with_no_rows():
     assert group_windows(make_df().iloc[0:0]) == []
+
+
+class StubClient:
+    def __init__(self, df):
+        self.df = df
+
+    def query(self, *args, **kwargs):
+        return self.df
+
+
+def test_drop_flagged_keeps_routine_quality_bits():
+    df = make_df()
+    df["QUALITY"] = df["QUALITY"].astype(object)
+    df.loc[0, "QUALITY"] = 0x400
+    df.loc[1, "QUALITY"] = "0x00000400"
+    df.loc[2, "QUALITY"] = 1024.0
+    assert len(drop_flagged(df)) == len(df)
+
+
+def test_drop_flagged_drops_bad_records():
+    df = make_df()
+    df["QUALITY"] = df["QUALITY"].astype(object)
+    df.loc[0, "QUALITY"] = 0x10000
+    df.loc[1, "QUALITY"] = "0x00011C00"
+    df.loc[2, "QUALITY"] = float("nan")
+    assert len(drop_flagged(df)) == len(df) - 3
+
+
+def test_drop_flagged_handles_empty_and_missing_column():
+    assert drop_flagged(pd.DataFrame()).empty
+    trimmed = make_df().drop(columns=["QUALITY"])
+    assert len(drop_flagged(trimmed)) == len(trimmed)
+
+
+def test_fetch_current_windows_filters_flagged_rows():
+    df = make_df()
+    df["QUALITY"] = [0, 0x10000, 0, 0, 0x11C00, 0]
+    windows = fetch_current_windows("2026.06.19_TAI", client=StubClient(df))
+    assert len(windows) == 2
+    for window in windows:
+        assert window["features"].shape == (2, len(PARAMETERS))
 
 
 class FlakyClient:
