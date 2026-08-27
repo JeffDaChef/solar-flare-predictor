@@ -12,6 +12,9 @@ PARAMETERS = [
 
 HISTORY = ["BFLARE", "CFLARE", "MFLARE", "XFLARE"]
 
+NOT_SERVED_BY_JSOC = ("TOTBSQ", "TOTFZ", "EPSZ", "TOTFY", "TOTFX", "EPSY", "EPSX")
+LIVE_PARAMETERS = [p for p in PARAMETERS if p not in NOT_SERVED_BY_JSOC]
+
 Instance = namedtuple("Instance", ["features", "history", "label", "flare_class", "name"])
 
 

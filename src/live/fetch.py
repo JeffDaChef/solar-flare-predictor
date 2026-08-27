@@ -4,10 +4,10 @@ import time
 import drms
 import pandas as pd
 
-from load import PARAMETERS
+from load import LIVE_PARAMETERS
 
 NRT_SERIES = "hmi.sharp_cea_720s_nrt"
-KEY_LIST = "HARPNUM,T_REC,NOAA_ARS,QUALITY," + ",".join(PARAMETERS)
+KEY_LIST = "HARPNUM,T_REC,NOAA_ARS,QUALITY," + ",".join(LIVE_PARAMETERS)
 RETRIES = 4
 RETRY_WAITS = (30, 120, 300)
 TIMEOUT = 45
@@ -53,7 +53,7 @@ def group_windows(df):
         return windows
     for harpnum, group in df.groupby("HARPNUM"):
         group = group.sort_values("T_REC")
-        numeric = group[PARAMETERS].apply(pd.to_numeric, errors="coerce")
+        numeric = group[LIVE_PARAMETERS].apply(pd.to_numeric, errors="coerce")
         windows.append({
             "harpnum": int(harpnum),
             "noaa_ars": str(group["NOAA_ARS"].iloc[-1]),

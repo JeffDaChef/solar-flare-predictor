@@ -9,7 +9,7 @@ from sklearn.metrics import roc_auc_score
 
 from load import iter_partition
 from metrics import best_threshold, tss
-from preprocess import summarize_instance
+from preprocess import live_columns, summarize_instance
 
 MODEL_PATH = "models/production.joblib"
 RESULT_PATH = "results/fulldisk.json"
@@ -27,7 +27,7 @@ def daily_scores(partition, scaler, model, data_dir="data"):
         regions.append(region.group(1))
         days.append(day.group(1))
         labels.append(inst.label)
-    probs = model.predict_proba(scaler.transform(np.asarray(feats)))[:, 1]
+    probs = model.predict_proba(scaler.transform(live_columns(feats)))[:, 1]
     per_day = defaultdict(dict)
     flare_day = defaultdict(int)
     for region, day, prob, label in zip(regions, days, probs, labels):

@@ -9,7 +9,7 @@ from sklearn.linear_model import LogisticRegression
 
 from fulldisk import daily_scores
 from metrics import best_threshold
-from preprocess import Standardizer, features_for_partition
+from preprocess import Standardizer, features_for_partition, live_columns
 
 MODEL_PATH = "models/production.joblib"
 
@@ -18,7 +18,7 @@ def _stack(parts):
     xs, ys = [], []
     for n in parts:
         X, y, _ = features_for_partition(n)
-        xs.append(X)
+        xs.append(live_columns(X))
         ys.append(y)
     return np.vstack(xs), np.concatenate(ys)
 

@@ -451,6 +451,52 @@ how the forecast turned out.
 - src/live/fetch.py drops rows whose QUALITY flag has the bad data bit set.
 - results/fulldisk.json has the held out numbers for the current model.
 
+## Step 12, the seven features that were never there
+
+After fixing the zero bug I still had one thing I could not explain. The model ranked
+live days a lot worse than it ranked historical ones, and rescaling cannot cause that,
+so something about the live data had to be different from the training data.
+
+It was, and it is dumber than I expected. Seven of my 24 magnetic measurements were
+arriving completely blank every single day. Not sometimes, not degraded, just gone.
+TOTBSQ, TOTFZ, EPSZ, TOTFY, TOTFX, EPSY and EPSX. My first theory was that the near
+real time feed is lower quality than the archival one, so I checked the archival series
+too, and they are missing from that one as well. JSOC does not publish them at all.
+They are Lorentz force quantities that the SWAN-SF authors computed themselves when
+they built the dataset, so they exist in my training files and nowhere I can actually
+reach.
+
+So there was never a version of this that worked. Since the day I put it live, seven of
+the 24 numbers going into the model were blanks, and my Standardizer quietly replaces
+blanks with the training average. The model was reading "perfectly average sunspot" for
+29 percent of its input on every region, every day. That is the ranking damage, and no
+amount of recalibrating was ever going to touch it.
+
+The fix is to train on the 17 measurements I can actually get. I expected to pay for
+that, since dropping features usually costs you something. It did not. On held out data
+the 17 feature model came out slightly ahead of the 24 feature one, AUC 0.9792 against
+0.9767 at the instance level, and the full disk numbers went up too, AUC 0.922 to 0.928
+and TSS 0.541 to 0.568. Those seven columns were not carrying information, they were
+carrying a constant, and the model is better off without the distraction.
+
+The part I was most nervous about was the wiring. Training reads a 144 number summary
+built from all 24 parameters and picks out the 102 that survive, while the live path
+builds 102 straight from a 17 column download. If those two orderings disagreed by even
+one slot, every feature would land in the wrong place and nothing would crash, I would
+just get quiet garbage forever. So there is now a test that builds both vectors from the
+same input and checks they match. They agree to 2e-16.
+
+I kept PARAMETERS at all 24 because that is a true statement about what is in SWAN-SF,
+and the neural network experiments earlier in this project used all of them. The live
+subset is a separate list. Nothing I already reported changed.
+
+## Where this part lives (the missing features)
+
+- src/load.py has NOT_SERVED_BY_JSOC and the LIVE_PARAMETERS subset.
+- src/preprocess.py has live_columns, which picks the trainable subset out of a full
+  SWAN-SF feature vector.
+- tests/test_preprocess.py checks the training path and the live path agree exactly.
+
 ## Where it stands now
 
 That is the whole build. The short version of where it landed:
@@ -458,10 +504,10 @@ That is the whole build. The short version of where it landed:
 - Four models, from a one line logistic regression to a hand built LSTM, all around
   TSS 0.83 on an honest time based split. The from scratch nets match PyTorch to
   machine precision.
-- The whole-Sun daily forecast scores AUC 0.92 and TSS 0.54 on a genuinely held out
+- The whole-Sun daily forecast scores AUC 0.93 and TSS 0.57 on a genuinely held out
   year, with the threshold picked before ever looking at that year, and it is
-  calibrated. It used to read better than that, and the version that read better could
-  not function on live data, which is the story in Step 11.
+  calibrated. It used to read better than that on paper, and the version that read
+  better could not function on live data at all, which is Steps 11 and 12.
 - A live system pulls the real Sun every day, forecasts, and grades itself against both
   reality and NOAA. Right now it runs more cautious than NOAA, and the public scoreboard
   tracks that honestly over time.

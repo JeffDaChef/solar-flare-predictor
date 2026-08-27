@@ -3,13 +3,15 @@ import os
 import numpy as np
 import pytest
 
-from load import HISTORY, PARAMETERS
+from load import HISTORY, LIVE_PARAMETERS, PARAMETERS
 from preprocess import (
     N_FEATURES,
+    N_LIVE_FEATURES,
     SEQ_LEN,
     Standardizer,
     build_features,
     instance_to_sequence,
+    live_columns,
     summarize_history,
     summarize_instance,
 )
@@ -84,3 +86,25 @@ def test_build_features_smoke():
 def test_build_features_with_history():
     X, _, _ = build_features(PARTITION3, limit=50, with_history=True)
     assert X.shape == (50, N_FEATURES + len(HISTORY))
+
+
+def test_live_parameters_exclude_keywords_jsoc_does_not_serve():
+    from load import NOT_SERVED_BY_JSOC
+    assert len(LIVE_PARAMETERS) == 17
+    assert not set(LIVE_PARAMETERS) & set(NOT_SERVED_BY_JSOC)
+    assert LIVE_PARAMETERS == [p for p in PARAMETERS if p in LIVE_PARAMETERS]
+
+
+def test_training_and_live_feature_order_match():
+    rng = np.random.default_rng(7)
+    raw = rng.normal(size=(30, len(PARAMETERS)))
+    keep = [PARAMETERS.index(p) for p in LIVE_PARAMETERS]
+    from_training = live_columns(summarize_instance(raw).reshape(1, -1))[0]
+    from_live = summarize_instance(raw[:, keep])
+    assert from_training.shape == (N_LIVE_FEATURES,)
+    assert np.allclose(from_training, from_live, equal_nan=True)
+
+
+def test_live_columns_selects_expected_width():
+    rng = np.random.default_rng(3)
+    assert live_columns(rng.normal(size=(5, N_FEATURES))).shape == (5, N_LIVE_FEATURES)

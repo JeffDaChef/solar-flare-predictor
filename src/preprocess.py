@@ -3,10 +3,19 @@ import warnings
 
 import numpy as np
 
-from load import HISTORY, PARAMETERS, iter_partition
+from load import HISTORY, LIVE_PARAMETERS, PARAMETERS, iter_partition
 
 STATS = ["mean", "std", "min", "max", "last", "slope"]
 N_FEATURES = len(PARAMETERS) * len(STATS)
+N_LIVE_FEATURES = len(LIVE_PARAMETERS) * len(STATS)
+LIVE_COLUMNS = [step * len(PARAMETERS) + i
+                for step in range(len(STATS))
+                for i, name in enumerate(PARAMETERS)
+                if name in set(LIVE_PARAMETERS)]
+
+
+def live_columns(X):
+    return np.asarray(X)[:, LIVE_COLUMNS]
 
 
 def _last(column):

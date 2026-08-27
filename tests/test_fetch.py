@@ -4,7 +4,7 @@ from urllib.error import URLError
 import pandas as pd
 import pytest
 
-from load import PARAMETERS
+from load import LIVE_PARAMETERS
 from live.fetch import TIMEOUT, drop_flagged, fetch_current_windows, group_windows, query_window
 
 
@@ -18,7 +18,7 @@ def make_df():
                 "NOAA_ARS": "14465",
                 "QUALITY": 0,
             }
-            for j, name in enumerate(PARAMETERS):
+            for j, name in enumerate(LIVE_PARAMETERS):
                 row[name] = float(harp + step + j)
             rows.append(row)
     return pd.DataFrame(rows)
@@ -28,7 +28,7 @@ def test_group_windows_shapes():
     windows = group_windows(make_df())
     assert len(windows) == 2
     for window in windows:
-        assert window["features"].shape == (3, len(PARAMETERS))
+        assert window["features"].shape == (3, len(LIVE_PARAMETERS))
         assert "harpnum" in window
         assert "noaa_ars" in window
 
@@ -79,7 +79,7 @@ def test_fetch_current_windows_filters_flagged_rows():
     windows = fetch_current_windows("2026.06.19_TAI", client=StubClient(df))
     assert len(windows) == 2
     for window in windows:
-        assert window["features"].shape == (2, len(PARAMETERS))
+        assert window["features"].shape == (2, len(LIVE_PARAMETERS))
 
 
 class FlakyClient:
@@ -136,4 +136,4 @@ def test_live_fetch_smoke():
     except Exception:
         pytest.skip("no network or JSOC unavailable")
     assert len(windows) > 0
-    assert windows[0]["features"].shape[1] == len(PARAMETERS)
+    assert windows[0]["features"].shape[1] == len(LIVE_PARAMETERS)
