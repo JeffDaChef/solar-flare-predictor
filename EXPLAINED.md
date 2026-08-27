@@ -433,6 +433,18 @@ bit, so the filter checks that bit and nothing else. Same seam in the log as the
 retrain, forecasts before 2026-08-26 came from the old model, and every record says
 which model made it.
 
+
+One more note on the log. On 2026-08-27 GitHub never ran the scheduled job at all. Not
+a failure, no red X, it just silently skipped the run, which they warn can happen when
+their schedulers are busy. I waited about three and a half hours past the cron time and
+then triggered the run by hand. It came out at 7.4 percent, which is the first forecast
+the fixed model ever made on the real Sun outside my laptop.
+
+I decided the rule for this before I ran anything, so I would not be picking based on
+which number I liked better. If a single UTC day ever ends up with two forecasts in the
+log, the first one stays and the second one gets deleted. Nothing about it depends on
+how the forecast turned out.
+
 ## Where this part lives (the zero bug)
 
 - src/production.py now calibrates with Platt scaling instead of isotonic.
