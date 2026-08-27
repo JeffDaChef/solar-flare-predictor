@@ -2,7 +2,7 @@
   "summary": {
     "n": 59,
     "flares": 20,
-    "threshold": 0.24,
+    "threshold": 0.26,
     "noaa_threshold": 0.5,
     "model": {
       "n": 59,
