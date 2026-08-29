@@ -445,6 +445,20 @@ which number I liked better. If a single UTC day ever ends up with two forecasts
 log, the first one stays and the second one gets deleted. Nothing about it depends on
 how the forecast turned out.
 
+And then it happened, on that same day. The run I triggered by hand landed at 04:29 UTC
+and that is the 7.4 percent one. Right after it I retrained on the 17 keywords, and then
+at 10:43 UTC a second run went off anyway, either GitHub's schedule finally waking up
+nine hours late or a dispatch I fired twice, I honestly cannot tell which from the logs.
+So 2026-08-27 had two forecasts and the rule said delete the later one. I did that on
+2026-08-28 without looking at how either of them got graded.
+
+It did sting a bit. The 04:29 one I kept came from the older model, and the 10:43 one I
+deleted was the only Aug 27 forecast the retrained model ever made, so throwing it out
+costs me a day off the new model's live record and pushes back when I can say anything
+about it. Which is exactly the sort of argument the rule exists to shut down, so I
+applied it anyway and the new model's track record just starts a day later. Every entry
+in the log says which model made it, so you can check that yourself.
+
 ## Where this part lives (the zero bug)
 
 - src/production.py now calibrates with Platt scaling instead of isotonic.
