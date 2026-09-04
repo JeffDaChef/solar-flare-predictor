@@ -511,6 +511,47 @@ subset is a separate list. Nothing I already reported changed.
   SWAN-SF feature vector.
 - tests/test_preprocess.py checks the training path and the live path agree exactly.
 
+## Step 13, the day JSOC was down
+
+On 2026-09-04 the scheduled run went off on time and still produced nothing. The job
+sat there for eleven minutes and then died with a socket timeout. It never got as far
+as the model. JSOC, the Stanford server that hands out the SHARP measurements, just
+stopped answering, and my fetch code retries four times with waits of 30, 120 and 300
+seconds, which adds up to almost exactly the eleven minutes the run took. So it tried
+everything it knew how to try and the data was not there.
+
+Nothing was wrong with my code. That is worth saying because my first instinct was to
+go looking for a bug I had introduced.
+
+But it did cost me a day of the live record, which I care about right now because I am
+waiting on graded days to say anything about the retrained model. So I changed the
+schedule. There is a second cron at 03:00 UTC now, two hours after the first one, and
+both runs start by checking whether today already has a forecast in the log. If it
+does, the run stops right there and does nothing. On a normal day the 03:00 run is a
+ten second no-op.
+
+That check turned out to fix two problems at once. The obvious one is the retry. The
+other is the thing from 2026-08-27, where GitHub silently skipped the scheduled run
+with no red X at all. A skipped run and a failed run look completely different in the
+Actions tab but they leave the same hole in the log, and the second cron fills both.
+
+It also means the one forecast per UTC day rule is now enforced by the code instead of
+by me remembering it. Two runs can no longer both write a forecast for the same day,
+which is the exact thing that happened to me on 2026-08-27 and cost me a day off the
+new model's record.
+
+If the 03:00 retry fails too, the workflow opens an issue on the repo saying which day
+got lost and linking the failed run. GitHub emails me when an issue opens, so I hear
+about it, and I end up with a written list of every day the data source let me down. I
+left the first failure loud, it still goes red like it always did. I wanted to be able
+to see a bad morning at a glance even on days where the retry saved it.
+
+## Where this part lives (the retry)
+
+- .github/workflows/daily.yml has both crons, the guard step, and the issue it opens
+  when a day is genuinely lost.
+- src/live/fetch.py is where the retries and the 45 second timeout live, unchanged.
+
 ## Where it stands now
 
 That is the whole build. The short version of where it landed:

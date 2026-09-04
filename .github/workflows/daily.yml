@@ -3,32 +3,73 @@ name: Daily Solar Flare Forecast
 on:
   schedule:
     - cron: "0 1 * * *"
+    - cron: "0 3 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   forecast:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check whether today already has a forecast
+        id: guard
+        run: |
+          today=$(date -u +%Y-%m-%d)
+          echo "date=$today" >> "$GITHUB_OUTPUT"
+          if grep -q "\"issued_utc\": \"$today" results/forecast_log.jsonl; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            echo "$today already has a forecast, stopping here." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            echo "No forecast for $today yet, issuing one." >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/setup-python@v5
+        if: steps.guard.outputs.needed == 'true'
         with:
           python-version: "3.11"
       - name: Install dependencies
+        if: steps.guard.outputs.needed == 'true'
         run: pip install -r requirements.txt
       - name: Issue forecast and update scoreboard
+        if: steps.guard.outputs.needed == 'true'
         run: PYTHONPATH=src python -m daily
       - name: Publish data to the website folder
+        if: steps.guard.outputs.needed == 'true'
         run: |
           cp results/forecast_log.jsonl docs/forecast_log.jsonl
           cp results/scoreboard.json docs/scoreboard.json
       - name: Commit the updated log
+        if: steps.guard.outputs.needed == 'true'
         run: |
           git config user.name "solar-flare-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add results/forecast_log.jsonl results/scoreboard.json docs/forecast_log.jsonl docs/scoreboard.json
           git commit -m "Daily forecast $(date -u +%Y-%m-%d)" || echo "no changes to commit"
           git push
+      - name: Report a lost day
+        if: failure() && github.event.schedule == '0 3 * * *'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DAY: ${{ steps.guard.outputs.date }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          cat > /tmp/issue.md <<EOF
+          The 01:00 UTC run did not produce a forecast for $DAY, and the 03:00 UTC retry failed too.
 
+          Failed run: $RUN_URL
+
+          The usual cause is JSOC being unreachable, which shows up as a socket timeout raised from \`src/live/fetch.py\`. Read the log before assuming it is anything else.
+
+          Once JSOC is answering again, fill the day in with:
+
+          \`\`\`
+          gh workflow run "Daily Solar Flare Forecast" --ref main
+          \`\`\`
+
+          The guard step skips if a forecast for $DAY already landed, so that is safe to run more than once.
+          EOF
+          gh issue create --title "No forecast issued for $DAY" --body-file /tmp/issue.md
