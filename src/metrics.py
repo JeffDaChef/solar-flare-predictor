@@ -44,6 +44,23 @@ def accuracy(y_true, y_pred):
     return _safe_divide(tp + tn, tp + fp + fn + tn)
 
 
+def auc(y_true, proba):
+    positives = sum(1 for value in y_true if value)
+    negatives = len(y_true) - positives
+    if positives == 0 or negatives == 0:
+        return None
+    pairs = sorted(zip(proba, y_true))
+    total, i = 0.0, 0
+    while i < len(pairs):
+        j = i
+        while j + 1 < len(pairs) and pairs[j + 1][0] == pairs[i][0]:
+            j += 1
+        rank = (i + j) / 2.0 + 1.0
+        total += rank * sum(1 for k in range(i, j + 1) if pairs[k][1])
+        i = j + 1
+    return (total - positives * (positives + 1) / 2.0) / (positives * negatives)
+
+
 def best_threshold(y_true, proba, grid=None):
     grid = np.linspace(0.02, 0.98, 49) if grid is None else np.asarray(grid)
     proba = np.asarray(proba)

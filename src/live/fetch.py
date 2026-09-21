@@ -12,6 +12,7 @@ RETRIES = 4
 RETRY_WAITS = (30, 120, 300)
 TIMEOUT = 45
 BAD_QUALITY = 0x10000
+SPAN_HOURS = 24
 
 
 def query_window(time_spec, client=None, retries=RETRIES, waits=RETRY_WAITS,
@@ -47,6 +48,11 @@ def drop_flagged(df):
     return df[df["QUALITY"].map(_quality_flags) < BAD_QUALITY]
 
 
+def _record_times(series):
+    cleaned = series.str.replace("_TAI", "", regex=False)
+    return pd.to_datetime(cleaned, format="%Y.%m.%d_%H:%M:%S").to_numpy(dtype="datetime64[ns]")
+
+
 def group_windows(df):
     windows = []
     if df is None or df.empty:
@@ -57,11 +63,12 @@ def group_windows(df):
         windows.append({
             "harpnum": int(harpnum),
             "noaa_ars": str(group["NOAA_ARS"].iloc[-1]),
+            "times": _record_times(group["T_REC"]),
             "features": numeric.to_numpy(dtype=float),
         })
     return windows
 
 
-def fetch_current_windows(start_tai, hours=12, cadence_min=12, client=None):
+def fetch_current_windows(start_tai, hours=SPAN_HOURS, cadence_min=12, client=None):
     time_spec = "[%s/%dh@%dm]" % (start_tai, hours, cadence_min)
     return group_windows(drop_flagged(query_window(time_spec, client=client)))

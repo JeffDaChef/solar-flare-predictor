@@ -1,6 +1,7 @@
 import socket
 from urllib.error import URLError
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -29,6 +30,8 @@ def test_group_windows_shapes():
     assert len(windows) == 2
     for window in windows:
         assert window["features"].shape == (3, len(LIVE_PARAMETERS))
+        assert window["times"].shape == (3,)
+        assert window["times"].dtype == np.dtype("datetime64[ns]")
         assert "harpnum" in window
         assert "noaa_ars" in window
 

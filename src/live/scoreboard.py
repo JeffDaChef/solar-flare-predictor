@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 import joblib
 
 from live.score import fetch_goes_xray, major_flare_in_window
-from metrics import hss, tss
+from metrics import auc, hss, tss
 
 LOG_PATH = "results/forecast_log.jsonl"
 BOARD_PATH = "results/scoreboard.json"
@@ -71,7 +71,8 @@ def grade_forecasts(forecasts, records, horizon_hours=24, now=None, known=None):
 def _score(probs, actual, threshold):
     predicted = [1 if p >= threshold else 0 for p in probs]
     brier = sum((p - a) ** 2 for p, a in zip(probs, actual)) / len(probs)
-    return {"n": len(probs), "tss": tss(actual, predicted), "hss": hss(actual, predicted), "brier": brier}
+    return {"n": len(probs), "tss": tss(actual, predicted), "hss": hss(actual, predicted),
+            "auc": auc(actual, probs), "brier": brier}
 
 
 def summarize(graded, threshold=FALLBACK_THRESHOLD, noaa_threshold=FALLBACK_THRESHOLD):
@@ -115,8 +116,9 @@ def main():
     model = summary["model"]
     print("Scoreboard over %d graded forecasts (%d had a real flare):"
           % (summary["n"], summary["flares"]))
-    print("  our model:  TSS %.3f  HSS %.3f  Brier %.4f"
-          % (model["tss"], model["hss"], model["brier"]))
+    print("  our model:  TSS %.3f  HSS %.3f  AUC %s  Brier %.4f"
+          % (model["tss"], model["hss"],
+             "n/a" if model["auc"] is None else "%.3f" % model["auc"], model["brier"]))
     if "noaa" in summary:
         noaa = summary["noaa"]
         ours = summary["model_head_to_head"]

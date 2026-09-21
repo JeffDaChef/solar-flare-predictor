@@ -552,6 +552,68 @@ to see a bad morning at a glance even on days where the retry saved it.
   when a day is genuinely lost.
 - src/live/fetch.py is where the retries and the 45 second timeout live, unchanged.
 
+## Step 14, the live score was bad and it was my own fault
+
+Around the middle of September I finally had enough graded days to check whether the
+retrained model was doing better live. It was doing worse. A lot worse. The old model
+scored AUC 0.68 on its 60 live days, the new one scored 0.167 on 23 days. Anything
+under 0.5 means it was ranking flare days below quiet days, which is worse than
+guessing.
+
+I chased three theories and all three were wrong, so I want to write them down because
+being wrong three times in a row was most of the work here.
+
+First I thought the calibration step had squashed the model's output range, because
+live it never produced a number above 0.14 and the alarm threshold is 0.26. I loaded
+the saved model and ran it on the held out year, and it still happily produces numbers
+up to 0.97. Nothing was squashed.
+
+Then I thought the live data must be miscalibrated. My training data was built from the
+definitive SHARP product and my live code pulls the near real time one, and those are
+genuinely two different data products. So I compared every live feature against the
+training distribution. They all sit between the 19th and 73rd percentile. The live data
+is sitting right in the middle of normal. That theory was dead too.
+
+Then I thought maybe the Sun is just quiet right now and the model has never seen a
+regime like it. I checked that by restricting the held out year to only the small quiet
+regions, and the model still scored 0.93 there. Also dead.
+
+What it actually was is embarrassing and much simpler. My training data has a median of
+16 overlapping 12 hour windows per region per day, and when I score the held out year I
+take the highest probability across all 16 of them. My live forecast looked at exactly
+one window, whatever the last 12 hours happened to be, and used that. So the held out
+number was best of 16 and the live number was best of 1. I had been comparing two
+different things this whole time and calling the gap a model problem.
+
+The fix is to make live do what the scoring does. It now pulls 24 hours instead of 12,
+slides nine 12 hour windows back across that day, and takes each region's highest
+probability. Every one of those windows still only uses data from before the forecast
+goes out, so there is no cheating.
+
+I replayed all 23 days through both versions before I changed anything. AUC went from
+0.167 up to 0.45. So the fix is real and it is worth having, but I want to be clear
+that 0.45 is still just coin flipping. This did not make the predictor work. It made
+the live number mean the same thing as the offline number, which it did not before.
+
+The honest caveat is that 23 days with only 3 flare days in them is not enough to
+conclude much either way. I ran a permutation test on the original 0.167 and it comes
+out around p 0.04, which is suggestive and nowhere near proof. The thing I trust here
+is the windows bug, because that one does not depend on sample size at all.
+
+Two other things I changed while I was in there. The forecast log now writes out all 17
+feature values for every region, not just the top three probabilities. The only reason
+this whole investigation was possible is that JSOC happened to still have September in
+its near real time archive, and if it had been down I would have been stuck. Now the
+numbers are in my own log. It costs about 2.4 MB a year. And the scoreboard reports AUC
+now, which is a little silly given AUC is the number this entire step was about and I
+was computing it by hand in a scratch file every time.
+
+## Where this part lives (the windows fix)
+
+- src/live/fetch.py keeps the timestamp of every record now, and pulls 24 hours.
+- src/live/forecast.py has best_window, which is the slide and take the max part.
+- src/metrics.py has auc, and src/live/scoreboard.py reports it.
+
 ## Where it stands now
 
 That is the whole build. The short version of where it landed:
@@ -566,6 +628,10 @@ That is the whole build. The short version of where it landed:
 - A live system pulls the real Sun every day, forecasts, and grades itself against both
   reality and NOAA. Right now it runs more cautious than NOAA, and the public scoreboard
   tracks that honestly over time.
+- Live, it still has no demonstrated skill. After fixing the windows bug in Step 14 it
+  sits around AUC 0.45 over 23 graded days, which is a coin flip. The offline numbers
+  are real and the live numbers are real and they do not agree yet, and I would rather
+  say that plainly than quietly report the 0.93.
 
 Honestly the part I care about most is that habit. Every time a result
 looked too good, I dug in and it turned out to be a leak or an artifact or the metric
