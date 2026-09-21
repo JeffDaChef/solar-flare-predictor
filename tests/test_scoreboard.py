@@ -1,6 +1,8 @@
 from datetime import datetime
 
-from live.scoreboard import grade_forecasts, summarize, window_covered
+from live.forecast import SCORING
+from live.scoreboard import (LEGACY_SCORING, grade_forecasts, summarize,
+                             window_covered)
 
 
 def dt(text):
@@ -79,3 +81,31 @@ def test_summarize_head_to_head_with_noaa():
 
 def test_summarize_empty():
     assert summarize([])["n"] == 0
+
+
+def test_forecasts_without_a_scoring_tag_are_marked_legacy():
+    forecasts = [{"issued_utc": "2026-06-01T00:00:00+00:00", "full_disk_prob": 0.4}]
+    records = [(dt("2026-06-01T05:00:00+00:00"), 3e-6)]
+    graded = grade_forecasts(forecasts, records, now=dt("2026-06-03T00:00:00+00:00"))
+    assert graded[0]["scoring"] == LEGACY_SCORING
+
+
+def test_scoring_tag_is_carried_through():
+    forecasts = [{"issued_utc": "2026-06-01T00:00:00+00:00", "full_disk_prob": 0.4,
+                  "scoring": SCORING}]
+    records = [(dt("2026-06-01T05:00:00+00:00"), 3e-6)]
+    graded = grade_forecasts(forecasts, records, now=dt("2026-06-03T00:00:00+00:00"))
+    assert graded[0]["scoring"] == SCORING
+
+
+def test_settled_entries_pick_up_the_scoring_of_their_forecast():
+    forecasts = [{"issued_utc": "2026-06-01T00:00:00+00:00", "full_disk_prob": 0.4,
+                  "scoring": SCORING}]
+    known = {"2026-06-01T00:00:00+00:00": {
+        "issued_utc": "2026-06-01T00:00:00+00:00",
+        "prob": 0.4,
+        "noaa_prob": None,
+        "actual": True,
+    }}
+    graded = grade_forecasts(forecasts, [], now=dt("2026-07-01T00:00:00+00:00"), known=known)
+    assert graded[0]["scoring"] == SCORING

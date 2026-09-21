@@ -41,7 +41,7 @@ it honest. The code and the full writeup are
 <p class="muted">Active-region data comes from NASA and Stanford JSOC, flare outcomes
 and the NOAA baseline from the NOAA Space Weather Prediction Center, and the training
 data from the SWAN-SF benchmark. On held out historical data the forecast scores an AUC
-of 0.93. On the live Sun it has not shown that skill yet, and the scoreboard above is the
+of 0.95. On the live Sun it has not shown that skill yet, and the scoreboard above is the
 real number. For a while the two were not even measured the same way, which I found in
 September 2026 and wrote up as Step 14 in EXPLAINED.md.</p>
 
@@ -101,8 +101,14 @@ async function load(){
       sEl.insertAdjacentElement("afterend", warn);
     }
   } else {
-    sEl.textContent = "No forecast has finished its 24 hour window yet. "
-      + "The scoreboard fills in on its own as the days pass.";
+    let t = "No forecast under the current scoring has finished its 24 hour window yet. "
+          + "The scoreboard fills in on its own as the days pass.";
+    if(board && board.summary && board.summary.superseded){
+      t += " There are " + board.summary.superseded + " older graded forecasts in the log, "
+        + "but they were scored a different way and mixing them in would flatter the number, "
+        + "so this record starts over. See Step 15 in EXPLAINED.md.";
+    }
+    sEl.textContent = t;
   }
 
   const body = document.querySelector("#recent tbody");

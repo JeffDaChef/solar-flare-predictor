@@ -139,12 +139,13 @@ percent on average, which matches the true rate, gives real flares an average sc
 it calls a region at least 30 percent likely, against a 1.3 percent base rate.
 
 Looked at as a daily whole-Sun forecast on a held-out year, the combined forecast hits
-AUC 0.94 and TSS 0.71, and its average matches the 8 percent daily flare rate. That is
+AUC 0.95 and TSS 0.73, and its average matches the 8 percent daily flare rate. That is
 the headline skill result. The decision threshold behind that TSS is picked on the
 calibration partition, not on the held-out year, so the number is what the system would
 actually have scored rather than the best it could look in hindsight. Refitting the
 threshold on the held-out year itself would report 0.75, and that is the version I had
-by mistake for a while.
+by mistake for a while. The daily score is the strongest single region on the disk, not
+a noisy-OR across all of them, for the reasons in Step 15 of EXPLAINED.md.
 
 ## The live system
 

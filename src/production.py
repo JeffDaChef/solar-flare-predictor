@@ -58,6 +58,15 @@ def train_and_save(train_parts=(1, 2, 3), calib_parts=(4,), path=MODEL_PATH):
     return path, int(len(y_train) + len(y_calib)), int(y_train.sum() + y_calib.sum())
 
 
+def retune_threshold(calib_parts=(4,), path=MODEL_PATH):
+    bundle = joblib.load(path)
+    scores, y_days = _daily_full_disk(calib_parts, bundle["scaler"], bundle["model"])
+    bundle["threshold"] = best_threshold(y_days, scores)
+    bundle["threshold_parts"] = list(calib_parts)
+    joblib.dump(bundle, path)
+    return bundle["threshold"]
+
+
 if __name__ == "__main__":
     path, n, flares = train_and_save()
     print("saved %s, trained on %d instances (%d flares)" % (path, n, flares))

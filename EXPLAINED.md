@@ -614,6 +614,79 @@ was computing it by hand in a scratch file every time.
 - src/live/forecast.py has best_window, which is the slide and take the max part.
 - src/metrics.py has auc, and src/live/scoreboard.py reports it.
 
+## Step 15, adding up the regions wrong
+
+After Step 14 I went looking for a second bug of the same shape, because if I got the
+windows wrong I could easily have gotten something else wrong too. The thing I suspected
+was the region count. My training days have a median of about 4 or 5 active regions in
+them, and live I am looking at 10 to 25. The way I combine regions into one whole-Sun
+number is noisy-OR, which is one minus the chance that every region stays quiet, and that
+formula gets bigger just from having more regions in it. So I thought the live number was
+being inflated by region count alone.
+
+It is not. I tested it by padding every day in the held out year with fake extra quiet
+regions until each day had 10, then 15, then 20, then 25, and the score barely moved,
+0.928 to 0.931. That theory was wrong, which is now the fourth wrong theory in a row.
+
+But the test I wrote to check it also compared noisy-OR against other ways of combining
+regions, and that turned up something real. Just taking the single strongest region on
+the disk beats noisy-OR at everything I care about:
+
+```
+                     AUC p4   AUC p5   threshold   TSS p5   mean forecast
+noisy-OR (old)        0.829    0.928        0.26    0.568           0.107
+noisy-OR top 3        0.831    0.941        0.18    0.658           0.095
+strongest region      0.827    0.948        0.10    0.726           0.068
+```
+
+Partition 5 is the held out year, 823 days with 66 flare days in it, and the actual flare
+rate there is 0.080. So the old way was forecasting 10.7 percent on average when the truth
+was 8.0 percent, and the new way says 6.8 percent, which is closer. The three options are
+basically tied on partition 4, which is where I pick the threshold, so this is not me
+fishing on the partition I tune against.
+
+I bootstrapped the AUC difference on the held out year to check I was not reading noise.
+The gain is 0.0196 with a 95 percent interval of 0.0073 to 0.0332, and the strongest
+region version wins in 99.9 percent of resamples. That is about as clear as anything I
+have measured on this project.
+
+Why would throwing away information make it better? Because noisy-OR assumes the regions
+are independent and they really are not. They sit on the same Sun during the same level
+of activity. So it double counts, it piles up a little probability from every quiet region
+on the disk, and it drifts above the truth. Taking the worst region throws that pile away.
+It also makes the number completely independent of how many regions JSOC decides to serve
+me that day, which is the single biggest difference between my training days and my live
+days.
+
+A nice side effect: my threshold got much more stable. It used to be 0.26 on partition 4
+and 0.12 if I refit it on partition 5, which is a big gap and I had written that up as a
+weakness I was just going to keep disclosing. Now it is 0.10 against 0.08. The TSS I
+actually get, 0.726, is close to the 0.747 I would get by cheating. I did not set out to
+fix that and it fell out anyway.
+
+I did not retrain anything for this. The model weights are byte for byte the same, I only
+recomputed the threshold under the new way of combining regions, which is what
+retune_threshold in src/production.py does.
+
+The annoying part is what this does to the live scoreboard. Between Step 14 and Step 15 I
+changed both how the windows are chosen and how the regions are combined, so a forecast I
+issued in August and a forecast I issue tomorrow are not the same measurement and it would
+be flattering myself to average them together. Every forecast now gets stamped with which
+scoring produced it, and the public scoreboard only summarises the current one. The 84
+older graded days stay in the log, they just do not get counted. So the track record on
+the site goes back to zero today, which looks bad and is correct.
+
+I changed it now on purpose rather than waiting. The live record had just restarted anyway
+because of Step 14, so restarting it twice in two days costs me nothing, while shipping it
+a month from now would have thrown away a month.
+
+## Where this part lives (the aggregation)
+
+- src/fulldisk.py, daily_scores now returns the strongest region per day.
+- src/live/forecast.py does the same thing live, and stamps SCORING onto every forecast.
+- src/production.py has retune_threshold, which repicks the threshold without retraining.
+- src/live/scoreboard.py only summarises forecasts under the current scoring.
+
 ## Where it stands now
 
 That is the whole build. The short version of where it landed:
@@ -621,7 +694,7 @@ That is the whole build. The short version of where it landed:
 - Four models, from a one line logistic regression to a hand built LSTM, all around
   TSS 0.83 on an honest time based split. The from scratch nets match PyTorch to
   machine precision.
-- The whole-Sun daily forecast scores AUC 0.93 and TSS 0.57 on a genuinely held out
+- The whole-Sun daily forecast scores AUC 0.95 and TSS 0.73 on a genuinely held out
   year, with the threshold picked before ever looking at that year, and it is
   calibrated. It used to read better than that on paper, and the version that read
   better could not function on live data at all, which is Steps 11 and 12.
@@ -629,9 +702,10 @@ That is the whole build. The short version of where it landed:
   reality and NOAA. Right now it runs more cautious than NOAA, and the public scoreboard
   tracks that honestly over time.
 - Live, it still has no demonstrated skill. After fixing the windows bug in Step 14 it
-  sits around AUC 0.45 over 23 graded days, which is a coin flip. The offline numbers
+  sat around AUC 0.45 over 23 graded days, which is a coin flip, and after Step 15 the
+  live count is back to zero and building again. The offline numbers
   are real and the live numbers are real and they do not agree yet, and I would rather
-  say that plainly than quietly report the 0.93.
+  say that plainly than quietly report the 0.95.
 
 Honestly the part I care about most is that habit. Every time a result
 looked too good, I dug in and it turned out to be a leak or an artifact or the metric

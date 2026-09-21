@@ -1,535 +1,598 @@
 {
   "summary": {
-    "n": 84,
-    "flares": 23,
-    "threshold": 0.26,
-    "noaa_threshold": 0.5,
-    "model": {
-      "n": 84,
-      "tss": 0.043478260869565216,
-      "hss": 0.06192893401015229,
-      "auc": 0.5235210263720599,
-      "brier": 0.25486656667948565
-    },
-    "noaa": {
-      "n": 84,
-      "tss": 0.29294369208838206,
-      "hss": 0.328537170263789,
-      "auc": 0.7990021382751248,
-      "brier": 0.15312976190476188
-    },
-    "model_head_to_head": {
-      "n": 84,
-      "tss": 0.043478260869565216,
-      "hss": 0.06192893401015229,
-      "auc": 0.5235210263720599,
-      "brier": 0.25486656667948565
-    }
+    "n": 0,
+    "threshold": 0.1,
+    "scoring": "strongest-region/9-window",
+    "superseded": 84
   },
   "graded": [
     {
       "issued_utc": "2026-06-23T18:41:52.342256+00:00",
       "prob": 0.005,
       "noaa_prob": 0.3,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-06-27T00:26:54.645478+00:00",
       "prob": 0.006629880346156303,
       "noaa_prob": 0.5,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-06-28T05:10:26.718842+00:00",
       "prob": 0.0058852250840469855,
       "noaa_prob": 0.5,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-06-29T05:21:41.733860+00:00",
       "prob": 0.008750806231369812,
       "noaa_prob": 0.5,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-01T05:14:20.777789+00:00",
       "prob": 0.032452220029972834,
       "noaa_prob": 0.7,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-02T04:51:46.436415+00:00",
       "prob": 0.2885047963739936,
       "noaa_prob": 0.7,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-03T04:33:55.324195+00:00",
       "prob": 0.028502094732263394,
       "noaa_prob": 0.7,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-04T04:26:46.752018+00:00",
       "prob": 0.012792152103412557,
       "noaa_prob": 0.7,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-05T04:48:03.632961+00:00",
       "prob": 0.006788861136473923,
       "noaa_prob": 0.75,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-06T05:02:03.141111+00:00",
       "prob": 0.005,
       "noaa_prob": 0.75,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-07T04:41:11.752512+00:00",
       "prob": 0.005,
       "noaa_prob": 0.55,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-08T04:00:31.234146+00:00",
       "prob": 0.005,
       "noaa_prob": 0.4,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-09T04:40:36.662854+00:00",
       "prob": 0.007398488095259781,
       "noaa_prob": 0.4,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-10T04:42:35.911474+00:00",
       "prob": 0.09090909090909094,
       "noaa_prob": 0.4,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-11T03:58:42.145290+00:00",
       "prob": 0.005,
       "noaa_prob": 0.3,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-12T04:19:52.934260+00:00",
       "prob": 0.005,
       "noaa_prob": 0.25,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-13T04:23:34.199280+00:00",
       "prob": 0.005,
       "noaa_prob": 0.25,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-14T03:50:48.325968+00:00",
       "prob": 0.005,
       "noaa_prob": 0.25,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-15T03:51:35.649770+00:00",
       "prob": 0.005,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-16T03:54:04.392695+00:00",
       "prob": 0.005,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-17T03:54:09.858706+00:00",
       "prob": 0.005,
       "noaa_prob": 0.25,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-18T03:47:46.315867+00:00",
       "prob": 0.005,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-19T04:16:06.559195+00:00",
       "prob": 0.02429149797570851,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-20T04:32:26.686282+00:00",
       "prob": 0.005,
       "noaa_prob": 0.15,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-21T04:09:03.390486+00:00",
       "prob": 0.11834319526627213,
       "noaa_prob": 0.4,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-22T04:10:51.616560+00:00",
       "prob": 0.009715809482830018,
       "noaa_prob": 0.55,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-23T04:01:17.485470+00:00",
       "prob": 0.011893977921013765,
       "noaa_prob": 0.55,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-24T03:59:47.495670+00:00",
       "prob": 0.008884974613669994,
       "noaa_prob": 0.55,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-25T03:56:23.954282+00:00",
       "prob": 0.011893977921013765,
       "noaa_prob": 0.35,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-26T04:20:15.378113+00:00",
       "prob": 0.010551024541260001,
       "noaa_prob": 0.35,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-27T04:29:39.511647+00:00",
       "prob": 0.005,
       "noaa_prob": 0.45,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-28T03:53:55.832166+00:00",
       "prob": 0.008076908399206384,
       "noaa_prob": 0.4,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-29T03:57:18.349462+00:00",
       "prob": 0.013757780772445716,
       "noaa_prob": 0.3,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-30T03:49:02.528137+00:00",
       "prob": 0.01090667418100677,
       "noaa_prob": 0.25,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-07-31T04:15:36.769698+00:00",
       "prob": 0.02337850050881274,
       "noaa_prob": 0.25,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-01T04:15:00.431838+00:00",
       "prob": 0.005,
       "noaa_prob": 0.35,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-02T04:18:06.065314+00:00",
       "prob": 0.005,
       "noaa_prob": 0.3,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-03T04:22:48.933863+00:00",
       "prob": 0.005,
       "noaa_prob": 0.2,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-04T03:56:48.236523+00:00",
       "prob": 0.005,
       "noaa_prob": 0.2,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-05T03:51:37.267601+00:00",
       "prob": 0.005,
       "noaa_prob": 0.2,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-06T03:56:41.005124+00:00",
       "prob": 0.005,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-07T03:42:41.000895+00:00",
       "prob": 0.005,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-08T02:48:03.546941+00:00",
       "prob": 0.005,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-09T02:55:42.286677+00:00",
       "prob": 0.005,
       "noaa_prob": 0.05,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-10T03:04:37.945954+00:00",
       "prob": 0.005,
       "noaa_prob": 0.01,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-11T02:58:00.427109+00:00",
       "prob": 0.005,
       "noaa_prob": 0.01,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-12T03:16:48.043789+00:00",
       "prob": 0.005,
       "noaa_prob": 0.05,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-13T03:21:22.318874+00:00",
       "prob": 0.005,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-14T03:19:00.824162+00:00",
       "prob": 0.005,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-15T02:06:38.301440+00:00",
       "prob": 0.005,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-17T02:12:17.908237+00:00",
       "prob": 0.005,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-18T02:08:06.433658+00:00",
       "prob": 0.005,
       "noaa_prob": 0.35,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-19T02:10:19.053026+00:00",
       "prob": 0.005,
       "noaa_prob": 0.35,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-20T02:09:52.784087+00:00",
       "prob": 0.005,
       "noaa_prob": 0.35,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-21T02:16:02.139677+00:00",
       "prob": 0.18218623481781382,
       "noaa_prob": 0.4,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-23T02:17:12.134621+00:00",
       "prob": 0.058637083993660855,
       "noaa_prob": 0.45,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-24T02:15:22.388059+00:00",
       "prob": 0.020330368487928796,
       "noaa_prob": 0.45,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-25T02:10:51.703982+00:00",
       "prob": 0.010476190476190528,
       "noaa_prob": 0.45,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-26T04:16:43.282265+00:00",
       "prob": 0.005,
       "noaa_prob": 0.55,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-27T04:29:24.524396+00:00",
       "prob": 0.07401375559077339,
       "noaa_prob": 0.55,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-28T12:20:48.378681+00:00",
       "prob": 0.0537032625620395,
       "noaa_prob": 0.45,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-29T07:30:39.517298+00:00",
       "prob": 0.06512777410573067,
       "noaa_prob": 0.25,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-30T06:00:34.443766+00:00",
       "prob": 0.05342488848253957,
       "noaa_prob": 0.25,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-08-31T06:21:23.099857+00:00",
       "prob": 0.09968660923447481,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-01T05:48:53.186007+00:00",
       "prob": 0.06928972091379038,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-02T05:12:13.618568+00:00",
       "prob": 0.05214630531531261,
       "noaa_prob": 0.1,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-03T05:16:09.203075+00:00",
       "prob": 0.06769387633393531,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-04T17:32:29.776912+00:00",
       "prob": 0.05935321887778244,
       "noaa_prob": 0.2,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-05T05:01:04.002847+00:00",
       "prob": 0.05086959378725586,
       "noaa_prob": 0.2,
-      "actual": true
+      "actual": true,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-06T05:14:44.107815+00:00",
       "prob": 0.138694853510146,
       "noaa_prob": 0.2,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-07T05:23:08.307434+00:00",
       "prob": 0.06888938969049063,
       "noaa_prob": 0.2,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-08T05:24:55.994877+00:00",
       "prob": 0.10030193191300185,
       "noaa_prob": 0.15,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-09T05:28:13.451196+00:00",
       "prob": 0.08514990086754193,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-10T05:24:50.377205+00:00",
       "prob": 0.0878921508177476,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-11T05:22:33.699428+00:00",
       "prob": 0.0619622085285193,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-12T05:12:49.415384+00:00",
       "prob": 0.058195808102060265,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-13T05:28:13.566630+00:00",
       "prob": 0.07876666250763154,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-14T05:32:29.364504+00:00",
       "prob": 0.05304916452955666,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-15T05:32:35.528423+00:00",
       "prob": 0.06514193758348907,
       "noaa_prob": 0.1,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-16T05:25:18.909432+00:00",
       "prob": 0.10273420311113735,
       "noaa_prob": 0.05,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-17T08:34:44.419443+00:00",
       "prob": 0.08653927209320278,
       "noaa_prob": 0.05,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-18T05:21:43.182613+00:00",
       "prob": 0.04763909973275615,
       "noaa_prob": 0.05,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-19T05:13:51.493791+00:00",
       "prob": 0.013863023983703093,
       "noaa_prob": 0.01,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     },
     {
       "issued_utc": "2026-09-20T05:30:50.052890+00:00",
       "prob": 0.05138510384423767,
       "noaa_prob": 0.01,
-      "actual": false
+      "actual": false,
+      "scoring": "noisy-or/single-window"
     }
   ]
 }

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 import joblib
 
+from live.forecast import SCORING
 from live.score import fetch_goes_xray, major_flare_in_window
 from metrics import auc, hss, tss
 
@@ -11,6 +12,7 @@ LOG_PATH = "results/forecast_log.jsonl"
 BOARD_PATH = "results/scoreboard.json"
 MODEL_PATH = "models/production.joblib"
 FALLBACK_THRESHOLD = 0.5
+LEGACY_SCORING = "noisy-or/single-window"
 
 
 def model_threshold(model_path=MODEL_PATH, fallback=FALLBACK_THRESHOLD):
@@ -55,6 +57,7 @@ def grade_forecasts(forecasts, records, horizon_hours=24, now=None, known=None):
             continue
         settled = known.get(forecast["issued_utc"])
         if settled is not None:
+            settled["scoring"] = forecast.get("scoring", LEGACY_SCORING)
             graded.append(settled)
             continue
         if not window_covered(records, issued, end):
@@ -63,6 +66,7 @@ def grade_forecasts(forecasts, records, horizon_hours=24, now=None, known=None):
             "issued_utc": forecast["issued_utc"],
             "prob": forecast["full_disk_prob"],
             "noaa_prob": forecast.get("noaa_major_prob"),
+            "scoring": forecast.get("scoring", LEGACY_SCORING),
             "actual": bool(major_flare_in_window(records, issued, end)),
         })
     return graded
@@ -99,7 +103,10 @@ def build_scoreboard(log_path=LOG_PATH, board_path=BOARD_PATH, threshold=None):
     forecasts = read_forecasts(log_path)
     records = fetch_goes_xray()
     graded = grade_forecasts(forecasts, records, known=read_graded(board_path))
-    summary = summarize(graded, threshold)
+    current = [g for g in graded if g.get("scoring", LEGACY_SCORING) == SCORING]
+    summary = summarize(current, threshold)
+    summary["scoring"] = SCORING
+    summary["superseded"] = len(graded) - len(current)
     os.makedirs(os.path.dirname(board_path), exist_ok=True)
     with open(board_path, "w") as handle:
         json.dump({"summary": summary, "graded": graded}, handle, indent=2)
@@ -109,7 +116,10 @@ def build_scoreboard(log_path=LOG_PATH, board_path=BOARD_PATH, threshold=None):
 def main():
     summary, _ = build_scoreboard()
     if summary["n"] == 0:
-        print("No forecasts have completed their 24h window yet.")
+        print("No forecasts under the current scoring have completed their 24h window yet.")
+        if summary.get("superseded"):
+            print("%d earlier forecasts were scored a different way and are kept out of this."
+                  % summary["superseded"])
         print("Pending forecasts: %d. The scoreboard fills in as they close."
               % len(read_forecasts()))
         return

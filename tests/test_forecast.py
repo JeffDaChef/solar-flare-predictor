@@ -101,4 +101,6 @@ def test_make_forecast_logs_when_data_is_usable(tmp_path, monkeypatch):
     log_path = tmp_path / "forecast_log.jsonl"
     record = forecast.make_forecast(log_path=str(log_path))
     assert record["n_regions"] == 1
+    assert record["scoring"] == forecast.SCORING
+    assert record["full_disk_prob"] == min(max(record["regions"][0]["prob"], 0.001), 0.995)
     assert len(log_path.read_text().strip().splitlines()) == 1

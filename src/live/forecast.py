@@ -16,6 +16,7 @@ MIN_STEPS = 20
 WINDOW_HOURS = 12
 STEP_HOURS = 1.5
 N_WINDOWS = 9
+SCORING = "strongest-region/9-window"
 NO_DATA_MESSAGE = ("No usable SHARP data in this window, so no forecast was issued. "
                    "This usually means JSOC has a gap in the near real time series.")
 
@@ -56,7 +57,7 @@ def forecast_from_windows(windows, scaler, model, issued, min_steps=MIN_STEPS):
             "features": {name: float("%.6g" % summary[i]) for i, name in enumerate(LIVE_PARAMETERS)},
         })
     probs = np.array([r["prob"] for r in rows])
-    full_disk = float(1.0 - np.prod(1.0 - probs)) if probs.size else 0.0
+    full_disk = float(probs.max()) if probs.size else 0.0
     full_disk = min(max(full_disk, 0.001), 0.995)
     rows.sort(key=lambda r: r["prob"], reverse=True)
     return full_disk, rows
@@ -82,6 +83,7 @@ def make_forecast(start_tai=None, hours=SPAN_HOURS, model_path=MODEL_PATH, log_p
         "full_disk_prob": full_disk,
         "noaa_major_prob": noaa,
         "model_trained_utc": bundle.get("trained_utc"),
+        "scoring": SCORING,
         "regions": rows,
     }
     os.makedirs(os.path.dirname(log_path), exist_ok=True)

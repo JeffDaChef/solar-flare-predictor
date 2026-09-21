@@ -36,9 +36,9 @@ def daily_scores(partition, scaler, model, data_dir="data"):
         if label == 1:
             flare_day[day] = 1
     order = sorted(per_day)
-    noisy_or = np.array([1.0 - np.prod([1.0 - p for p in per_day[d].values()]) for d in order])
+    scores = np.array([max(per_day[d].values()) for d in order])
     y = np.array([flare_day[d] for d in order])
-    return noisy_or, y
+    return scores, y
 
 
 def evaluate(partition=5, model_path=MODEL_PATH, result_path=RESULT_PATH):
