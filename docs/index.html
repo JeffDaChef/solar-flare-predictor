@@ -40,9 +40,10 @@ it honest. The code and the full writeup are
 
 <p class="muted">Active-region data comes from NASA and Stanford JSOC, flare outcomes
 and the NOAA baseline from the NOAA Space Weather Prediction Center, and the training
-data from the SWAN-SF benchmark. On historical data the forecast scores an AUC of 0.94.
-On the live Sun it currently runs more conservative than NOAA, which this page shows
-honestly rather than hiding.</p>
+data from the SWAN-SF benchmark. On held out historical data the forecast scores an AUC
+of 0.93. On the live Sun it has not shown that skill yet, and the scoreboard above is the
+real number. For a while the two were not even measured the same way, which I found in
+September 2026 and wrote up as Step 14 in EXPLAINED.md.</p>
 
 <script>
 function pct(x){ return (x==null || isNaN(x)) ? "n/a" : (100*x).toFixed(1)+"%"; }
@@ -77,15 +78,28 @@ async function load(){
   const sEl = document.getElementById("scoreboard");
   if(board && board.summary && board.summary.n > 0){
     const sum = board.summary;
+    const auc = v => (v == null) ? "n/a" : v.toFixed(2);
     let t = "Over " + sum.n + " graded forecasts (" + sum.flares + " had a real flare): "
-          + "TSS " + sum.model.tss.toFixed(2) + ", HSS " + sum.model.hss.toFixed(2)
+          + "AUC " + auc(sum.model.auc) + ", TSS " + sum.model.tss.toFixed(2)
+          + ", HSS " + sum.model.hss.toFixed(2)
           + ", Brier " + sum.model.brier.toFixed(3) + ".";
     if(sum.noaa){
-      t += " On the " + sum.noaa.n + " days NOAA also forecast, mine scored TSS "
-        + sum.model_head_to_head.tss.toFixed(2) + " against NOAA's " + sum.noaa.tss.toFixed(2)
+      t += " On the " + sum.noaa.n + " days NOAA also forecast, mine scored AUC "
+        + auc(sum.model_head_to_head.auc) + " against NOAA's " + auc(sum.noaa.auc)
+        + ", and TSS " + sum.model_head_to_head.tss.toFixed(2)
+        + " against NOAA's " + sum.noaa.tss.toFixed(2)
         + " (mine called at " + pct(sum.threshold) + ", NOAA at " + pct(sum.noaa_threshold) + ").";
     }
     sEl.textContent = t;
+    if(sum.model.auc != null && sum.model.auc < 0.65){
+      const warn = document.createElement("p");
+      warn.className = "muted";
+      warn.textContent = "Read that AUC before you trust anything else on this page. "
+        + "0.5 means the forecast is no better than a coin flip at telling flare days from "
+        + "quiet days, and right now mine is close to that. NOAA is clearly better. I am "
+        + "leaving this up as it is instead of quietly tuning it until the number looks nice.";
+      sEl.insertAdjacentElement("afterend", warn);
+    }
   } else {
     sEl.textContent = "No forecast has finished its 24 hour window yet. "
       + "The scoreboard fills in on its own as the days pass.";
