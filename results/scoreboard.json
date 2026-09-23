@@ -3,7 +3,7 @@
     "n": 0,
     "threshold": 0.1,
     "scoring": "strongest-region/9-window",
-    "superseded": 84
+    "superseded": 85
   },
   "graded": [
     {
@@ -593,6 +593,13 @@
       "noaa_prob": 0.01,
       "actual": false,
       "scoring": "noisy-or/single-window"
+    },
+    {
+      "issued_utc": "2026-09-21T05:36:16.724201+00:00",
+      "prob": 0.05233371653133534,
+      "noaa_prob": 0.01,
+      "scoring": "noisy-or/single-window",
+      "actual": false
     }
   ]
 }
