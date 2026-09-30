@@ -1,29 +1,29 @@
 {
   "summary": {
-    "n": 5,
+    "n": 6,
     "flares": 0,
     "threshold": 0.1,
     "noaa_threshold": 0.5,
     "model": {
-      "n": 5,
+      "n": 6,
       "tss": 0.0,
       "hss": 0.0,
       "auc": null,
-      "brier": 0.003300989483193858
+      "brier": 0.003308012612220844
     },
     "noaa": {
-      "n": 5,
+      "n": 6,
       "tss": 0.0,
       "hss": 0.0,
       "auc": null,
-      "brier": 0.028000000000000008
+      "brier": 0.02500000000000001
     },
     "model_head_to_head": {
-      "n": 5,
+      "n": 6,
       "tss": 0.0,
       "hss": 0.0,
       "auc": null,
-      "brier": 0.003300989483193858
+      "brier": 0.003308012612220844
     },
     "scoring": "strongest-region/9-window",
     "superseded": 85
@@ -655,6 +655,13 @@
     {
       "issued_utc": "2026-09-27T05:56:15.360199+00:00",
       "prob": 0.0706019191993087,
+      "noaa_prob": 0.1,
+      "scoring": "strongest-region/9-window",
+      "actual": false
+    },
+    {
+      "issued_utc": "2026-09-28T09:38:30.816993+00:00",
+      "prob": 0.05781979122545994,
       "noaa_prob": 0.1,
       "scoring": "strongest-region/9-window",
       "actual": false
