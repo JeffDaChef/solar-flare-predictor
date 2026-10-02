@@ -1,29 +1,29 @@
 {
   "summary": {
-    "n": 6,
+    "n": 8,
     "flares": 0,
     "threshold": 0.1,
     "noaa_threshold": 0.5,
     "model": {
-      "n": 6,
+      "n": 8,
       "tss": 0.0,
       "hss": 0.0,
       "auc": null,
-      "brier": 0.003308012612220844
+      "brier": 0.0027501667260879186
     },
     "noaa": {
-      "n": 6,
+      "n": 8,
       "tss": 0.0,
       "hss": 0.0,
       "auc": null,
-      "brier": 0.02500000000000001
+      "brier": 0.02125000000000001
     },
     "model_head_to_head": {
-      "n": 6,
+      "n": 8,
       "tss": 0.0,
       "hss": 0.0,
       "auc": null,
-      "brier": 0.003308012612220844
+      "brier": 0.0027501667260879186
     },
     "scoring": "strongest-region/9-window",
     "superseded": 85
@@ -662,6 +662,20 @@
     {
       "issued_utc": "2026-09-28T09:38:30.816993+00:00",
       "prob": 0.05781979122545994,
+      "noaa_prob": 0.1,
+      "scoring": "strongest-region/9-window",
+      "actual": false
+    },
+    {
+      "issued_utc": "2026-09-29T06:21:21.983567+00:00",
+      "prob": 0.0307761333923375,
+      "noaa_prob": 0.1,
+      "scoring": "strongest-region/9-window",
+      "actual": false
+    },
+    {
+      "issued_utc": "2026-09-30T06:05:39.167870+00:00",
+      "prob": 0.03472877407561829,
       "noaa_prob": 0.1,
       "scoring": "strongest-region/9-window",
       "actual": false
