@@ -1,29 +1,29 @@
 {
   "summary": {
-    "n": 21,
-    "flares": 5,
+    "n": 23,
+    "flares": 6,
     "threshold": 0.1,
     "noaa_threshold": 0.5,
     "model": {
-      "n": 21,
-      "tss": 0.7375,
-      "hss": 0.7375,
-      "auc": 0.8125,
-      "brier": 0.177213594935632
+      "n": 23,
+      "tss": 0.7745098039215687,
+      "hss": 0.7745098039215687,
+      "auc": 0.8333333333333334,
+      "brier": 0.19518260956795075
     },
     "noaa": {
-      "n": 21,
-      "tss": 0.3375,
-      "hss": 0.391304347826087,
-      "auc": 0.65625,
-      "brier": 0.16499999999999998
+      "n": 23,
+      "tss": 0.2745098039215686,
+      "hss": 0.32748538011695905,
+      "auc": 0.6813725490196079,
+      "brier": 0.1768478260869565
     },
     "model_head_to_head": {
-      "n": 21,
-      "tss": 0.7375,
-      "hss": 0.7375,
-      "auc": 0.8125,
-      "brier": 0.177213594935632
+      "n": 23,
+      "tss": 0.7745098039215687,
+      "hss": 0.7745098039215687,
+      "auc": 0.8333333333333334,
+      "brier": 0.19518260956795075
     },
     "scoring": "strongest-region/9-window",
     "superseded": 85
@@ -767,6 +767,20 @@
     {
       "issued_utc": "2026-10-15T05:22:18.204206+00:00",
       "prob": 0.08787651460826658,
+      "noaa_prob": 0.2,
+      "scoring": "strongest-region/9-window",
+      "actual": false
+    },
+    {
+      "issued_utc": "2026-10-16T05:14:12.461398+00:00",
+      "prob": 0.12814216505819467,
+      "noaa_prob": 0.25,
+      "scoring": "strongest-region/9-window",
+      "actual": true
+    },
+    {
+      "issued_utc": "2026-10-17T05:09:25.827061+00:00",
+      "prob": 0.0870542478296344,
       "noaa_prob": 0.2,
       "scoring": "strongest-region/9-window",
       "actual": false
