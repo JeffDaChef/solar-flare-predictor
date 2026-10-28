@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: "0 1 * * *"
     - cron: "0 3 * * *"
+    - cron: "0 9 * * *"
   workflow_dispatch:
 
 permissions:
@@ -51,14 +52,14 @@ jobs:
           git commit -m "Daily forecast $(date -u +%Y-%m-%d)" || echo "no changes to commit"
           git push
       - name: Report a lost day
-        if: failure() && github.event.schedule == '0 3 * * *'
+        if: failure() && github.event.schedule == '0 9 * * *'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DAY: ${{ steps.guard.outputs.date }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           cat > /tmp/issue.md <<EOF
-          The 01:00 UTC run did not produce a forecast for $DAY, and the 03:00 UTC retry failed too.
+          The 01:00 UTC run did not produce a forecast for $DAY, and the 03:00 and 09:00 UTC retries failed too.
 
           Failed run: $RUN_URL
 

@@ -546,9 +546,16 @@ about it, and I end up with a written list of every day the data source let me d
 left the first failure loud, it still goes red like it always did. I wanted to be able
 to see a bad morning at a glance even on days where the retry saved it.
 
+That list got long enough to matter. Between late September and late October the first
+run went red about twice a week, every time with the same JSOC timeout, and three days
+(09-22, 10-01, 10-11) were lost because both runs hit the same outage. JSOC usually comes
+back within a few hours, so the 03:00 retry was just too close to the first try. In late
+October I added a third cron at 09:00 UTC. It uses the same guard, so on a normal day it
+does nothing, and now the issue only opens if all three fail.
+
 ## Where this part lives (the retry)
 
-- .github/workflows/daily.yml has both crons, the guard step, and the issue it opens
+- .github/workflows/daily.yml has all three crons, the guard step, and the issue it opens
   when a day is genuinely lost.
 - src/live/fetch.py is where the retries and the 45 second timeout live, unchanged.
 
